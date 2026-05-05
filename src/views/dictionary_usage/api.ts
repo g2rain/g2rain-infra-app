@@ -7,8 +7,6 @@ import { getHttpClient } from '@/components/http';
 import type { DictionaryUsage, DictionaryUsagePayload, DictionaryUsageQuery } from './type';
 import type { PageData, PageSelectListDto } from '@platform/types/api.type';
 
-// 导入 mock 数据以触发自动注册（副作用导入）
-import './mock';
 // 字典项 API 与 Mock（抽屉内使用，进入字典用途页即注册）
 import './dictionary_item/api';
 
@@ -21,7 +19,7 @@ export class DictionaryUsageApi {
    * @param params 查询参数（可选）
    * @returns dictionary_usage列表
    */
-  static async list(params?: { usageCode?: string; page?: number; size?: number }): Promise<DictionaryUsage[]> {
+  static async list(params?: DictionaryUsageQuery): Promise<DictionaryUsage[]> {
     const http = getHttpClient('default');
     const res = await http.get<DictionaryUsage[]>('/infra/dictionary_usage/list', params);
     return res.data || [];
@@ -32,22 +30,9 @@ export class DictionaryUsageApi {
    * @param params 查询参数（继承PageSelectListDto，包含基础查询和业务查询条件）
    * @returns 分页数据
    */
-  static async page(
-    params: DictionaryUsageQuery & PageSelectListDto,
-  ): Promise<PageData<DictionaryUsage>> {
+  static async page(params: DictionaryUsageQuery & PageSelectListDto): Promise<PageData<DictionaryUsage>> {
     const http = getHttpClient('default');
     const res = await http.get<PageData<DictionaryUsage>>('/infra/dictionary_usage/page', params);
-    return res.data;
-  }
-
-  /**
-   * 按 ID 查询单条明细
-   * @param id dictionary_usage ID
-   * @returns dictionary_usage详情
-   */
-  static async getById(id: number): Promise<DictionaryUsage> {
-    const http = getHttpClient('default');
-    const res = await http.get<DictionaryUsage>(`/infra/dictionary_usage/${id}`);
     return res.data;
   }
 

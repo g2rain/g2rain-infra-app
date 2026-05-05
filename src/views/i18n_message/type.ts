@@ -8,8 +8,7 @@ import type { BaseSelectListDto, BaseVo } from '@platform/types/api.type';
  * i18n_message接口
  */
 export interface I18nMessage extends BaseVo {
-  messageUsageId: number;
-  messageUsageName?: string;
+  messageUsageCode: string;
   languageCode: string;
   regionCode: string;
   messageCode: string;
@@ -22,7 +21,7 @@ export interface I18nMessage extends BaseVo {
  */
 export interface I18nMessagePayload {
   id?: number; // 更新时传入 ID，新增时不传
-  messageUsageId?: number;
+  messageUsageCode?: string;
   languageCode?: string;
   regionCode?: string;
   messageCode?: string;
@@ -37,11 +36,13 @@ export interface I18nMessagePayload {
  */
 export interface I18nMessageQuery extends BaseSelectListDto {
   // 业务查询字段
-  messageUsageId?: number;
+  messageUsageCode?: string;
   languageCode?: string;
   regionCode?: string;
   messageCode?: string;
-  messageText?: string;
-  extendField?: string;
 }
 
+export interface I18nMsgUsage extends BaseVo {
+  code: string;
+  name: string;
+}

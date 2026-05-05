@@ -35,6 +35,4 @@ export interface G2rainRaindropQuery extends BaseSelectListDto {
   bizTag?: string;
   maxId?: number;
   step?: number;
-  description?: string;
 }
-

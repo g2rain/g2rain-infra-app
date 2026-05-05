@@ -20,36 +20,26 @@ export interface ViewRouteConfig {
  * 你可以在子应用生成后按需补充 `views/*` 并在这里注册。
  */
 export const routeMap: Record<string, ViewRouteConfig> = {
-    '/g2rain_raindrop': {
-            component: () => import('@/views/g2rain_raindrop/index.vue'),
-            name: 'G2rainRaindrop',
-            meta: { title: 'g2rain_raindrop', requiresAuth: true, showInHome: true },
-        },
-    '/dictionary_usage': {
-            component: () => import('@/views/dictionary_usage/index.vue'),
-            name: 'DictionaryUsage',
-            meta: { title: 'dictionary_usage', requiresAuth: true, showInHome: true },
-        },
-    '/route_definition': {
-            component: () => import('@/views/route_definition/index.vue'),
-            name: 'RouteDefinition',
-            meta: { title: 'route_definition', requiresAuth: true, showInHome: true },
-        },
-    '/locale_setting': {
-            component: () => import('@/views/locale_setting/index.vue'),
-            name: 'LocaleSetting',
-            meta: { title: 'locale_setting', requiresAuth: true, showInHome: true },
-        },
-    '/i18n_message_usage': {
-            component: () => import('@/views/i18n_message_usage/index.vue'),
-            name: 'I18nMessageUsage',
-            meta: { title: 'i18n_message_usage', requiresAuth: true, showInHome: true },
-        },
-    '/i18n_message': {
-            component: () => import('@/views/i18n_message/index.vue'),
-            name: 'I18nMessage',
-            meta: { title: 'i18n_message', requiresAuth: true, showInHome: true },
-        }
+  '/g2rain_raindrop': {
+    component: () => import('@/views/g2rain_raindrop/index.vue'),
+    name: 'G2rainRaindrop',
+    meta: { title: 'g2rain_raindrop', requiresAuth: true, showInHome: true },
+  },
+  '/dictionary_usage': {
+    component: () => import('@/views/dictionary_usage/index.vue'),
+    name: 'DictionaryUsage',
+    meta: { title: 'dictionary_usage', requiresAuth: true, showInHome: true },
+  },
+  '/locale_setting': {
+    component: () => import('@/views/locale_setting/index.vue'),
+    name: 'LocaleSetting',
+    meta: { title: 'locale_setting', requiresAuth: true, showInHome: true },
+  },
+  '/i18n_message': {
+    component: () => import('@/views/i18n_message/index.vue'),
+    name: 'I18nMessage',
+    meta: { title: 'i18n_message', requiresAuth: true, showInHome: true },
+  }
 };
 
 export function getRouteComponent(

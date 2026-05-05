@@ -4,11 +4,8 @@
  */
 
 import { getHttpClient } from '@/components/http';
-import type { I18nMessage, I18nMessagePayload, I18nMessageQuery } from './type';
+import type { I18nMessage, I18nMessagePayload, I18nMessageQuery, I18nMsgUsage } from './type';
 import type { PageData, PageSelectListDto } from '@platform/types/api.type';
-
-// 导入 mock 数据以触发自动注册（副作用导入）
-import './mock';
 
 /**
  * i18n_message API 服务类
@@ -19,7 +16,7 @@ export class I18nMessageApi {
    * @param params 查询参数（可选）
    * @returns i18n_message列表
    */
-  static async list(params?: { messageUsageId?: number; page?: number; size?: number }): Promise<I18nMessage[]> {
+  static async list(params?: I18nMessageQuery): Promise<I18nMessage[]> {
     const http = getHttpClient('default');
     const res = await http.get<I18nMessage[]>('/infra/i18n_message/list', params);
     return res.data || [];
@@ -30,22 +27,9 @@ export class I18nMessageApi {
    * @param params 查询参数（继承PageSelectListDto，包含基础查询和业务查询条件）
    * @returns 分页数据
    */
-  static async page(
-    params: I18nMessageQuery & PageSelectListDto,
-  ): Promise<PageData<I18nMessage>> {
+  static async page(params: I18nMessageQuery & PageSelectListDto): Promise<PageData<I18nMessage>> {
     const http = getHttpClient('default');
     const res = await http.get<PageData<I18nMessage>>('/infra/i18n_message/page', params);
-    return res.data;
-  }
-
-  /**
-   * 按 ID 查询单条明细
-   * @param id i18n_message ID
-   * @returns i18n_message详情
-   */
-  static async getById(id: number): Promise<I18nMessage> {
-    const http = getHttpClient('default');
-    const res = await http.get<I18nMessage>(`/infra/i18n_message/${id}`);
     return res.data;
   }
 
@@ -68,6 +52,15 @@ export class I18nMessageApi {
   static async remove(id: number): Promise<void> {
     const http = getHttpClient('default');
     await http.delete(`/infra/i18n_message/${id}`);
+  }
+
+  /**
+   * 获取国际化用途集合
+   */
+  static async i18nMessageUsages(): Promise<I18nMsgUsage[]> {
+    const http = getHttpClient('default');
+    const res = await http.get<I18nMsgUsage[]>(`/infra/i18n_message/i18n_message_usages`);
+    return res.data;
   }
 }
 

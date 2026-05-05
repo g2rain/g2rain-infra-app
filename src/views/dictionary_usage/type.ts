@@ -32,6 +32,5 @@ export interface DictionaryUsageQuery extends BaseSelectListDto {
   // 业务查询字段
   usageCode?: string;
   usageName?: string;
-  description?: string;
 }
 

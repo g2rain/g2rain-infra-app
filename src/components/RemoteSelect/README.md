@@ -199,7 +199,7 @@ const form = reactive({
 
 #### 2）需要“打开就有默认列表”的场景（谨慎开启）
 
-仅当你的 `apiMethod` 支持**空关键字分页/默认列表**时再开启（本仓库若未接入 `DictItemApi`，请将 `:api-method` 换成你项目里对应的接口）：
+仅当你的 `apiMethod` 支持**空关键字分页/默认列表**时再开启：
 
 ```vue
 <ApiSelect

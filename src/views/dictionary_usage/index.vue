@@ -26,7 +26,7 @@
       <div class="dictionary_usage-page__title-group">
         <h2>管理字典用途数据</h2>
       </div>
-      <el-button type="primary"  @click="handleCreate">新增字典用途</el-button> <!--v-permission="'dictionary_usage:add'"-->
+      <el-button type="primary" v-permission="'dictionary_usage:add'" @click="handleCreate">新增字典用途</el-button>
     </div>
 
     <SortableTable :data="tableData" border stripe style="width: 100%" :enable-multi-sort="true" @sort-change="handleSortChange">
@@ -39,9 +39,9 @@
       <el-table-column label="操作" fixed="right" width="210">
         <template #default="{ row }">
           <el-button type="primary" link size="small" @click="handleView(row)">明细</el-button>
-          <el-button type="primary" link size="small" @click="openDictionaryItems(row)">字典项</el-button> <!--v-permission="'dictionary_usage:items'" -->
-          <el-button type="primary"  link size="small" @click="handleEdit(row)">编辑</el-button> <!--v-permission="'dictionary_usage:edit'"-->
-          <el-button type="danger" link size="small" @click="handleDelete(row)">删除</el-button> <!--v-permission="'dictionary_usage:delete'" -->
+          <el-button type="primary" v-permission="'dictionary_usage:items'" link size="small" @click="openDictionaryItems(row)">字典项</el-button>
+          <el-button type="primary" v-permission="'dictionary_usage:edit'" link size="small" @click="handleEdit(row)">编辑</el-button>
+          <el-button type="danger" v-permission="'dictionary_usage:delete'" link size="small" @click="handleDelete(row)">删除</el-button>
         </template>
         <template #header>
           <div style="display: flex; align-items: center; gap: 8px;">

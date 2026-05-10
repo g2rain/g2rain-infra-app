@@ -7,9 +7,6 @@ import { getHttpClient } from '@/components/http';
 import type { DictionaryItem, DictionaryItemPayload, DictionaryItemQuery, DictionaryItemTree } from './type';
 import type { PageData, PageSelectListDto } from '@platform/types/api.type';
 
-// 导入 mock 数据以触发自动注册（副作用导入）
-import './mock';
-
 /**
  * dictionary_item API 服务类
  */
@@ -19,7 +16,7 @@ export class DictionaryItemApi {
    * @param params 查询参数（可选）
    * @returns dictionary_item列表
    */
-  static async list(params?: { parentId?: number; page?: number; size?: number }): Promise<DictionaryItem[]> {
+  static async list(params?: DictionaryItemQuery): Promise<DictionaryItem[]> {
     const http = getHttpClient('default');
     const res = await http.get<DictionaryItem[]>('/infra/dictionary_item/list', params);
     return res.data || [];
@@ -30,9 +27,7 @@ export class DictionaryItemApi {
    * @param params 查询参数（继承PageSelectListDto，包含基础查询和业务查询条件）
    * @returns 分页数据
    */
-  static async page(
-    params: DictionaryItemQuery & PageSelectListDto,
-  ): Promise<PageData<DictionaryItem>> {
+  static async page(params: DictionaryItemQuery & PageSelectListDto): Promise<PageData<DictionaryItem>> {
     const http = getHttpClient('default');
     const res = await http.get<PageData<DictionaryItem>>('/infra/dictionary_item/page', params);
     return res.data;
@@ -41,23 +36,12 @@ export class DictionaryItemApi {
   /**
    * 树形字典项列表（用于选择上级节点）
    */
-  static async tree(dictionaryUsageId: number): Promise<DictionaryItemTree[]> {
+  static async tree(usageCode: string): Promise<DictionaryItemTree[]> {
     const http = getHttpClient('default');
     const res = await http.get<DictionaryItemTree[]>('/infra/dictionary_item/tree', {
-      dictionaryUsageId,
+      usageCode,
     });
     return res.data || [];
-  }
-
-  /**
-   * 按 ID 查询单条明细
-   * @param id dictionary_item ID
-   * @returns dictionary_item详情
-   */
-  static async getById(id: number): Promise<DictionaryItem> {
-    const http = getHttpClient('default');
-    const res = await http.get<DictionaryItem>(`/infra/dictionary_item/${id}`);
-    return res.data;
   }
 
   /**

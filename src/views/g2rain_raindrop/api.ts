@@ -7,9 +7,6 @@ import { getHttpClient } from '@/components/http';
 import type { G2rainRaindrop, G2rainRaindropPayload, G2rainRaindropQuery } from './type';
 import type { PageData, PageSelectListDto } from '@platform/types/api.type';
 
-// 导入 mock 数据以触发自动注册（副作用导入）
-import './mock';
-
 /**
  * g2rain_raindrop API 服务类
  */
@@ -19,7 +16,7 @@ export class G2rainRaindropApi {
    * @param params 查询参数（可选）
    * @returns g2rain_raindrop列表
    */
-  static async list(params?: { bizTag?: string; page?: number; size?: number }): Promise<G2rainRaindrop[]> {
+  static async list(params?: G2rainRaindropQuery): Promise<G2rainRaindrop[]> {
     const http = getHttpClient('default');
     const res = await http.get<G2rainRaindrop[]>('/infra/g2rain_raindrop/list', params);
     return res.data || [];
@@ -30,22 +27,9 @@ export class G2rainRaindropApi {
    * @param params 查询参数（继承PageSelectListDto，包含基础查询和业务查询条件）
    * @returns 分页数据
    */
-  static async page(
-    params: G2rainRaindropQuery & PageSelectListDto,
-  ): Promise<PageData<G2rainRaindrop>> {
+  static async page(params: G2rainRaindropQuery & PageSelectListDto): Promise<PageData<G2rainRaindrop>> {
     const http = getHttpClient('default');
     const res = await http.get<PageData<G2rainRaindrop>>('/infra/g2rain_raindrop/page', params);
-    return res.data;
-  }
-
-  /**
-   * 按 ID 查询单条明细
-   * @param id g2rain_raindrop ID
-   * @returns g2rain_raindrop详情
-   */
-  static async getById(id: number): Promise<G2rainRaindrop> {
-    const http = getHttpClient('default');
-    const res = await http.get<G2rainRaindrop>(`/infra/g2rain_raindrop/${id}`);
     return res.data;
   }
 
@@ -68,6 +52,15 @@ export class G2rainRaindropApi {
   static async remove(id: number): Promise<void> {
     const http = getHttpClient('default');
     await http.delete(`/infra/g2rain_raindrop/${id}`);
+  }
+
+  /**
+   * 查询业务标签字典集合
+   */
+  static async bizTagDict(): Promise<string[]> {
+    const http = getHttpClient('default');
+    const res = await http.get<string[]>(`/infra/g2rain_raindrop/biz_tag_dict`);
+    return res.data;
   }
 }
 

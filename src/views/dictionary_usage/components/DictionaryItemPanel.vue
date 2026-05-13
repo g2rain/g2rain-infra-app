@@ -154,7 +154,7 @@ const props = defineProps<{
 const queryFormRef = ref<InstanceType<typeof QueryForm> | null>(null);
 
 // 基础查询表单（与 QueryForm 的 QueryFormData 对齐）
-const baseQueryForm = ref<QueryFormData>({
+const baseQueryForm = reactive<QueryFormData>({
   id: undefined,
   createTime: undefined,
   updateTime: undefined,
@@ -181,7 +181,7 @@ const loadData = async () => {
   try {
     // 合并基础查询 + 业务查询，并过滤空值
     const query = Object.fromEntries(
-      Object.entries({ ...baseQueryForm.value, ...queryForm, usageCode: props.dictionaryUsageCode})
+      Object.entries({ ...baseQueryForm, ...queryForm, usageCode: props.dictionaryUsageCode})
         .filter(([_, v]) => (v ?? '') !== '' && [v].flat().length)
     ) as DictionaryItemQuery;
 
@@ -406,10 +406,10 @@ async function refreshParentTree() {
 }
 
 function resetQueryFields() {
-  baseQueryForm.value.id = undefined;
-  baseQueryForm.value.createTime = undefined;
-  baseQueryForm.value.updateTime = undefined;
-  baseQueryForm.value.sorts = undefined;
+  baseQueryForm.id = undefined;
+  baseQueryForm.createTime = undefined;
+  baseQueryForm.updateTime = undefined;
+  baseQueryForm.sorts = undefined;
   queryForm.parentId = undefined as number | undefined;
   queryForm.code = '';
   queryForm.name = '';

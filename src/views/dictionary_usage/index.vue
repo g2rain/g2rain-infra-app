@@ -125,7 +125,7 @@ import DictionaryItemPanel from './components/DictionaryItemPanel.vue';
 const queryFormRef = ref<InstanceType<typeof QueryForm> | null>(null);
 
 // 基础查询表单（与 QueryForm 的 QueryFormData 对齐）
-const baseQueryForm = reactive<QueryFormData>({
+let baseQueryForm = reactive<QueryFormData>({
   id: undefined,
   createTime: undefined,
   updateTime: undefined,

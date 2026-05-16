@@ -80,9 +80,8 @@ import en from 'element-plus/es/locale/lang/en'
  */
 export interface QueryFormData {
   id?: number
-  /** 与 BaseSelectListDto 的 string[] 区间及表单 [start,end] 元组均兼容 */
-  createTime?: [string, string] | string[]
-  updateTime?: [string, string] | string[]
+  createTime?: [string, string]
+  updateTime?: [string, string]
   sorts?: string[]
   // 允许扩展字段（比如 organId、applicationName 等）
   [key: string]: any
@@ -156,27 +155,25 @@ function onIdChange(v: string | number) {
 /**
  * 时间范围 Hook
  */
-function useTimeRange(
-  field: 'createTime' | 'updateTime'
-) {
+function useTimeRange(field: 'createTime' | 'updateTime') {
   return computed<[string, string] | null>({
-    get(): [string, string] | null {
+    get() {
       const value = props.modelValue[field]
 
-      if (!value || value.length < 2) {
+      if (!value || value.length !== 2) {
         return null
       }
 
-      // BaseSelectListDto 为 string[]，表单绑定为二元组
-      return [String(value[0]), String(value[1])]
+      // 返回拷贝，避免直接改 props；保持 [string, string] 元组类型
+      return [value[0], value[1]] as [string, string]
     },
-    set(v) {
+    set(v: [string, string] | null) {
       if (!v) {
         updateField(field, undefined as any)
         return
       }
 
-      updateField(field, [...v] as [string, string] | string[])
+      updateField(field, [...v] as any)
     }
   })
 }

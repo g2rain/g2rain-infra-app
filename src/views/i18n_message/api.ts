@@ -62,5 +62,14 @@ export class I18nMessageApi {
     const res = await http.get<I18nMsgUsage[]>(`/infra/i18n_message/i18n_message_usages`);
     return res.data;
   }
+
+  /**
+   * 获取标签字典（已有 tag 列表，用于下拉选择）
+   */
+  static async tagDict(): Promise<string[]> {
+    const http = getHttpClient('default');
+    const res = await http.get<string[]>(`/infra/i18n_message/tag_dict`);
+    return res.data || [];
+  }
 }
 

@@ -136,12 +136,7 @@ import { ref, reactive, watch, computed } from 'vue';
 import type { FormInstance, FormRules } from 'element-plus';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import { DictionaryItemApi } from '@/views/dictionary_usage/dictionary_item/api';
-import type {
-  DictionaryItem,
-  DictionaryItemPayload,
-  DictionaryItemQuery,
-  DictionaryItemTree,
-} from '@/views/dictionary_usage/dictionary_item/type';
+import type { DictionaryItem, DictionaryItemPayload, DictionaryItemQuery, DictionaryItemTree} from '@/views/dictionary_usage/dictionary_item/type';
 import type { PageSelectListDto } from '@platform/types/api.type';
 import type { QueryFormData } from '@/components/QueryForm';
 import { SortableTable, TableColumn, SortManagerButton, QueryForm, showErrorMessage } from '@/components';

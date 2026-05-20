@@ -59,6 +59,7 @@ CREATE TABLE `locale_setting` (
   `code` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '区域标识,如 zh-CN',
   `name` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '区域名称,如 中国-简体中文',
   `description` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '语言描述',
+  `sort_index` int DEFAULT NULL COMMENT '业务排序',
   `create_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `version` int NOT NULL DEFAULT '0' COMMENT '记录版本',

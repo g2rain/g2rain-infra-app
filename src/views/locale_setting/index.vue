@@ -35,6 +35,7 @@
       <el-table-column prop="id" label="地区语言标识" width="120" />
       <el-table-column prop="code" label="编码" width="180" />
       <el-table-column prop="name" label="名称" width="180" />
+      <el-table-column prop="sortIndex" label="排序" width="140" />
       <el-table-column prop="description" label="描述" width="180" />
       <TableColumn prop="createTime" label="创建时间" width="180" :sortable="true" />
       <TableColumn prop="updateTime" label="更新时间" width="180" :sortable="true" />
@@ -68,7 +69,7 @@
 
     <!-- 新增 / 编辑弹窗 -->
     <el-dialog v-model="editDialogVisible" :title="isEdit ? '编辑地区语言' : '新增地区语言'" width="520px">
-      <el-form ref="editFormRef" :model="editForm" :rules="editRules" label-width="100px">
+      <el-form ref="editFormRef" :model="editForm" :rules="editRules" label-width="120px">
         <el-form-item label="编码" prop="code">
           <el-select v-model="editForm.code" :disabled="isEdit" placeholder="请选择编码" filterable style="width: 200px">
             <el-option v-for="item in localeOptions" :key="item.value" :label="item.label" :value="item.value" />
@@ -76,6 +77,17 @@
         </el-form-item>
         <el-form-item label="名称" prop="name">
           <el-input v-model="editForm.name" placeholder="请输入名称" />
+        </el-form-item>
+        <el-form-item label="排序" prop="sortIndex">
+          <el-input-number
+            v-model="editForm.sortIndex"
+            :min="0"
+            :step="1"
+            :precision="0"
+            controls-position="right"
+            placeholder="请输入排序"
+            style="width: 100%"
+          />
         </el-form-item>
         <el-form-item label="描述" prop="description">
           <el-input v-model="editForm.description" placeholder="请输入描述" />
@@ -98,6 +110,7 @@
           </el-tag>
         </el-descriptions-item>
         <el-descriptions-item label="名称">{{ currentRow?.name }}</el-descriptions-item>
+        <el-descriptions-item label="排序">{{ currentRow?.sortIndex }}</el-descriptions-item>
         <el-descriptions-item label="描述">{{ currentRow?.description }}</el-descriptions-item>
         <el-descriptions-item label="创建时间">{{ currentRow?.createTime }}</el-descriptions-item>
         <el-descriptions-item label="更新时间">{{ currentRow?.updateTime }}</el-descriptions-item>
@@ -268,6 +281,7 @@ const editForm = reactive({
   id: undefined as number | undefined,
   code: '',
   name: '',
+  sortIndex: undefined as number | undefined,
   description: '',
 });
 
@@ -275,6 +289,7 @@ const editForm = reactive({
 const editRules: FormRules = {
   code: [{ required: true, message: '请输入编码', trigger: 'blur' }],
   name: [{ required: true, message: '请输入名称', trigger: 'blur' }],
+  sortIndex: [{ required: true, message: '请输入排序', trigger: 'blur' }],
 };
 
 // 打开创建弹窗
@@ -284,6 +299,7 @@ const handleCreate = () => {
 
   editForm.code = '';
   editForm.name = '';
+  editForm.sortIndex = 0;
   editForm.description = '';
   editDialogVisible.value = true;
 };
@@ -296,6 +312,7 @@ const handleEdit = (row: LocaleSetting) => {
   editForm.id = row.id;
   editForm.code = row.code;
   editForm.name = row.name;
+  editForm.sortIndex = row.sortIndex;
   editForm.description = row.description;
   editDialogVisible.value = true;
 };
@@ -309,6 +326,7 @@ const submitEdit = async () => {
   const payload: LocaleSettingPayload = {
     code: editForm.code,
     name: editForm.name,
+    sortIndex: editForm.sortIndex,
     description: editForm.description,
   };
 

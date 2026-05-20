@@ -11,6 +11,7 @@ export interface LocaleSetting extends BaseVo {
   code: string;
   name: string;
   description: string;
+  sortIndex: number;
 }
 
 /**
@@ -21,6 +22,7 @@ export interface LocaleSettingPayload {
   code?: string;
   name?: string;
   description?: string;
+  sortIndex?: number;
 }
 
 /**

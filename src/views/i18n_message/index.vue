@@ -6,7 +6,14 @@
       <QueryForm ref="queryFormRef" v-model="baseQueryForm" @search="handleSearch">
         <!-- 业务特定查询字段 -->
         <el-form-item label="消息用途">
-          <el-select v-model="queryForm.messageUsageCode" placeholder="请选择业务标签" clearable filterable style="width: 200px">
+          <el-select
+            v-model="queryForm.messageUsageCode"
+            placeholder="请选择业务标签"
+            clearable
+            filterable
+            style="width: 200px"
+            @change="onQueryMessageUsageChange"
+          >
             <el-option v-for="item in usageOptions" :key="item.value" :label="item.label" :value="item.value" />
           </el-select>
         </el-form-item>
@@ -32,6 +39,11 @@
             :disabled="!queryForm.languageCode"
           >
             <el-option v-for="item in queryRegionSelectOptions" :key="item.value" :label="item.label" :value="item.value" />
+          </el-select>
+        </el-form-item>
+        <el-form-item v-if="queryForm.messageUsageCode === MESSAGE_USAGE_UI_MESSAGE" label="标签">
+          <el-select v-model="queryForm.tag" placeholder="请选择标签" clearable filterable style="width: 200px">
+            <el-option v-for="item in tagOptions" :key="item.value" :label="item.label" :value="item.value" />
           </el-select>
         </el-form-item>
         <el-form-item label="消息编码">
@@ -66,6 +78,7 @@
       </el-table-column>
       <el-table-column prop="languageCode" label="语言代码" width="180" />
       <el-table-column prop="regionCode" label="区域代码" width="180" />
+      <el-table-column prop="tag" label="标签" width="160" />
       <el-table-column prop="messageCode" label="消息编码" width="180" />
       <TableColumn prop="createTime" label="创建时间" width="180" :sortable="true" />
       <TableColumn prop="updateTime" label="更新时间" width="180" :sortable="true" />
@@ -101,8 +114,28 @@
     <el-dialog v-model="editDialogVisible" :title="isEdit ? '编辑国际化信息' : '新增国际化信息'" width="520px">
       <el-form ref="editFormRef" :model="editForm" :rules="editRules" label-width="130px">
         <el-form-item label="国际化信息用途" prop="messageUsageCode">
-          <el-select v-model="editForm.messageUsageCode" placeholder="请选择业务标签" clearable filterable style="width: 200px">
+          <el-select
+            v-model="editForm.messageUsageCode"
+            placeholder="请选择业务标签"
+            clearable
+            filterable
+            style="width: 200px"
+            @change="onEditMessageUsageChange"
+          >
             <el-option v-for="item in usageOptions" :key="item.value" :label="item.label" :value="item.value" />
+          </el-select>
+        </el-form-item>
+        <el-form-item v-if="showEditTagField" label="标签" prop="tag">
+          <el-select
+            v-model="editForm.tag"
+            placeholder="请选择或输入标签"
+            clearable
+            filterable
+            allow-create
+            default-first-option
+            style="width: 100%"
+          >
+            <el-option v-for="item in editTagSelectOptions" :key="item.value" :label="item.label" :value="item.value" />
           </el-select>
         </el-form-item>
         <el-form-item label="语言代码" prop="languageCode">
@@ -157,6 +190,9 @@
         </el-descriptions-item>
         <el-descriptions-item label="语言代码">{{ currentRow?.languageCode }}</el-descriptions-item>
         <el-descriptions-item label="区域代码">{{ currentRow?.regionCode }}</el-descriptions-item>
+        <el-descriptions-item v-if="currentRow?.messageUsageCode === MESSAGE_USAGE_UI_MESSAGE" label="标签">
+          {{ currentRow?.tag }}
+        </el-descriptions-item>
         <el-descriptions-item label="消息编码">{{ currentRow?.messageCode }}</el-descriptions-item>
         <el-descriptions-item label="消息内容">{{ currentRow?.messageText }}</el-descriptions-item>
         <el-descriptions-item label="扩展字段">{{ currentRow?.extendField }}</el-descriptions-item>
@@ -183,8 +219,12 @@ import type { BaseSelectListDto, PageSelectListDto } from '@platform/types/api.t
 
 import { SortableTable, TableColumn, SortManagerButton, QueryForm, showErrorMessage } from '@/components';
 
+/** UI 文案类国际化用途编码 */
+const MESSAGE_USAGE_UI_MESSAGE = 'UI_MESSAGE';
+
 // 定义字典引用
 const usageOptions = ref<Array<{ label: string; value: string }>>([]);
+const tagOptions = ref<Array<{ label: string; value: string }>>([]);
 
 /** 语言 → 区域代码列表（来自 get_language_countries） */
 const languageCountryMap = ref<LanguageCountriesMap>({});
@@ -222,6 +262,18 @@ const editRegionSelectOptions = computed(() => {
   return opts;
 });
 
+const showEditTagField = computed(() => editForm.messageUsageCode === MESSAGE_USAGE_UI_MESSAGE);
+
+/** 编辑弹窗：若已有 tag 不在字典中，仍展示为可选项 */
+const editTagSelectOptions = computed(() => {
+  const base = tagOptions.value;
+  const tag = editForm.tag;
+  if (tag && !base.some(o => o.value === tag)) {
+    return [...base, { value: tag, label: tag }];
+  }
+  return base;
+});
+
 const onQueryLanguageChange = () => {
   const regions = languageCountryMap.value[queryForm.languageCode];
   if (queryForm.regionCode && (!regions || !regions.includes(queryForm.regionCode))) {
@@ -236,12 +288,31 @@ const onEditLanguageChange = () => {
   }
 };
 
+const onEditMessageUsageChange = () => {
+  if (editForm.messageUsageCode !== MESSAGE_USAGE_UI_MESSAGE) {
+    editForm.tag = '';
+    editFormRef.value?.clearValidate('tag');
+  }
+};
+
+const onQueryMessageUsageChange = () => {
+  if (queryForm.messageUsageCode !== MESSAGE_USAGE_UI_MESSAGE) {
+    queryForm.tag = '';
+  }
+};
+
 // 获取字典信息
 const loadDicts = async () => {
   const list = await I18nMessageApi.i18nMessageUsages();
   usageOptions.value = list.map(u => ({
     value: u.code,
     label: u.name,
+  }));
+
+  const tagList = await I18nMessageApi.tagDict();
+  tagOptions.value = tagList.map(tag => ({
+    value: tag,
+    label: tag,
   }));
 
   try {
@@ -265,6 +336,7 @@ let baseQueryForm = reactive<BaseSelectListDto>({
 // 业务特定查询表单
 const queryForm = reactive({
   messageUsageCode: '',
+  tag: '',
   languageCode: '',
   regionCode: '',
   messageCode: '',
@@ -324,6 +396,7 @@ const handleReset = () => {
   
   // 重置业务特定查询表单
   queryForm.messageUsageCode = '';
+  queryForm.tag = '';
   queryForm.languageCode = '';
   queryForm.regionCode = '';
   queryForm.messageCode = '';  
@@ -390,6 +463,7 @@ const editFormRef = ref<FormInstance | null>(null);
 const editForm = reactive({
   id: undefined as number | undefined,
   messageUsageCode: '',
+  tag: '',
   languageCode: '',
   regionCode: '',
   messageCode: '',
@@ -397,13 +471,19 @@ const editForm = reactive({
   extendField: undefined as string | undefined,
 });
 
-// 表单校验规则 
-const editRules: FormRules = {
-  messageUsageCode: [{ required: true, message: '请选择消息用途', trigger: 'blur' }],
-  languageCode: [{ required: true, message: '请选择语言代码', trigger: 'change' }],
-  messageCode: [{ required: true, message: '请输入消息编码', trigger: 'blur' }],
-  messageText: [{ required: true, message: '请输入消息内容', trigger: 'blur' }],
-};
+// 表单校验规则
+const editRules = computed<FormRules>(() => {
+  const rules: FormRules = {
+    messageUsageCode: [{ required: true, message: '请选择消息用途', trigger: 'blur' }],
+    languageCode: [{ required: true, message: '请选择语言代码', trigger: 'change' }],
+    messageCode: [{ required: true, message: '请输入消息编码', trigger: 'blur' }],
+    messageText: [{ required: true, message: '请输入消息内容', trigger: 'blur' }],
+  };
+  if (showEditTagField.value) {
+    rules.tag = [{ required: true, message: '请选择或输入标签', trigger: 'change' }];
+  }
+  return rules;
+});
 
 // 打开创建弹窗
 const handleCreate = () => {
@@ -411,6 +491,7 @@ const handleCreate = () => {
   editFormRef.value?.clearValidate();
 
   editForm.messageUsageCode = '';
+  editForm.tag = '';
   editForm.languageCode = '';
   editForm.regionCode = '';
   editForm.messageCode = '';
@@ -426,6 +507,7 @@ const handleEdit = (row: I18nMessage) => {
 
   editForm.id = row.id;
   editForm.messageUsageCode = row.messageUsageCode;
+  editForm.tag = row.tag ?? '';
   editForm.languageCode = row.languageCode;
   editForm.regionCode = row.regionCode;
   editForm.messageCode = row.messageCode;
@@ -447,6 +529,7 @@ const submitEdit = async () => {
     messageCode: editForm.messageCode,
     messageText: editForm.messageText,
     extendField: editForm.extendField,
+    tag: editForm.messageUsageCode === MESSAGE_USAGE_UI_MESSAGE ? editForm.tag : undefined,
   };
 
   try {
@@ -455,6 +538,10 @@ const submitEdit = async () => {
       payload.id = editForm.id;
     }
     await I18nMessageApi.save(payload);
+
+    if (!isEdit.value && editForm.messageUsageCode === MESSAGE_USAGE_UI_MESSAGE) {
+      await loadDicts();
+    }
     ElMessage.success(isEdit.value ? '更新成功' : '新增成功');
     await loadData();
     editDialogVisible.value = false;

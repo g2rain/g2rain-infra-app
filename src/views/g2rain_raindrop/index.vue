@@ -71,15 +71,31 @@
 
     <!-- 新增 / 编辑弹窗 -->
     <el-dialog v-model="editDialogVisible" :title="isEdit ? '编辑发号器' : '新增发号器'" width="520px">
-      <el-form ref="editFormRef" :model="editForm" :rules="editRules" label-width="100px">
+      <el-form ref="editFormRef" :model="editForm" :rules="editRules" label-width="120px">
         <el-form-item label="业务标签" prop="bizTag">
           <el-input v-model="editForm.bizTag" placeholder="请输入业务标签" />
         </el-form-item>
         <el-form-item label="最大 ID" prop="maxId">
-          <el-input v-model="editForm.maxId" placeholder="请输入最大 ID" />
+          <el-input-number
+            v-model="editForm.maxId"
+            :min="0"
+            :step="1"
+            :precision="0"
+            controls-position="right"
+            placeholder="请输入最大 ID"
+            style="width: 100%"
+          />
         </el-form-item>
         <el-form-item label="步长" prop="step">
-          <el-input v-model="editForm.step" placeholder="请输入步长" />
+          <el-input-number
+            v-model="editForm.step"
+            :min="0"
+            :step="1"
+            :precision="0"
+            controls-position="right"
+            placeholder="请输入步长"
+            style="width: 100%"
+          />
         </el-form-item>
         <el-form-item label="描述" prop="description">
           <el-input v-model="editForm.description" placeholder="请输入描述" />
@@ -300,8 +316,8 @@ const handleCreate = () => {
   editFormRef.value?.clearValidate();
 
   editForm.bizTag = '';
-  editForm.maxId = undefined as number | undefined,
-  editForm.step = undefined as number | undefined,
+  editForm.maxId = 0;
+  editForm.step = 0;
   editForm.description = '';
   editDialogVisible.value = true;
 };
@@ -327,8 +343,8 @@ const submitEdit = async () => {
 
   const payload: G2rainRaindropPayload = {
     bizTag: editForm.bizTag,
-    maxId: Number(editForm.maxId),
-    step: Number(editForm.step),
+    maxId: editForm.maxId,
+    step: editForm.step,
     description: editForm.description,
   };
 

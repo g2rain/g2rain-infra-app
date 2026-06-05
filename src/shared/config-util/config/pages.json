@@ -1,31 +1,21 @@
 [
   {
-    "pageName": "g2rain_raindrop",
+    "pageName": "发号器",
     "pageCode": "g2rain_raindrop",
     "linkPath": "/g2rain_raindrop"
   },
   {
-    "pageName": "dictionary_usage",
+    "pageName": "字典用途",
     "pageCode": "dictionary_usage",
     "linkPath": "/dictionary_usage"
   },
   {
-    "pageName": "route_definition",
-    "pageCode": "route_definition",
-    "linkPath": "/route_definition"
-  },
-  {
-    "pageName": "locale_setting",
+    "pageName": "地区语言",
     "pageCode": "locale_setting",
     "linkPath": "/locale_setting"
   },
   {
-    "pageName": "i18n_message_usage",
-    "pageCode": "i18n_message_usage",
-    "linkPath": "/i18n_message_usage"
-  },
-  {
-    "pageName": "i18n_message",
+    "pageName": "国际化信息",
     "pageCode": "i18n_message",
     "linkPath": "/i18n_message"
   }

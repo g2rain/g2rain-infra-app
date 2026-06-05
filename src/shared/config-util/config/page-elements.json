@@ -82,30 +82,6 @@
   {
     "parentId": null,
     "pageElementName": "新增",
-    "pageElementCode": "i18n_message_usage:add",
-    "pageElementType": "button",
-    "pageCode": "i18n_message_usage",
-    "status": "ENABLED"
-  },
-  {
-    "parentId": null,
-    "pageElementName": "删除",
-    "pageElementCode": "i18n_message_usage:delete",
-    "pageElementType": "button",
-    "pageCode": "i18n_message_usage",
-    "status": "ENABLED"
-  },
-  {
-    "parentId": null,
-    "pageElementName": "编辑",
-    "pageElementCode": "i18n_message_usage:edit",
-    "pageElementType": "button",
-    "pageCode": "i18n_message_usage",
-    "status": "ENABLED"
-  },
-  {
-    "parentId": null,
-    "pageElementName": "新增",
     "pageElementCode": "i18n_message:add",
     "pageElementType": "button",
     "pageCode": "i18n_message",
@@ -149,30 +125,6 @@
     "pageElementCode": "locale_setting:edit",
     "pageElementType": "button",
     "pageCode": "locale_setting",
-    "status": "ENABLED"
-  },
-  {
-    "parentId": null,
-    "pageElementName": "新增",
-    "pageElementCode": "route_definition:add",
-    "pageElementType": "button",
-    "pageCode": "route_definition",
-    "status": "ENABLED"
-  },
-  {
-    "parentId": null,
-    "pageElementName": "删除",
-    "pageElementCode": "route_definition:delete",
-    "pageElementType": "button",
-    "pageCode": "route_definition",
-    "status": "ENABLED"
-  },
-  {
-    "parentId": null,
-    "pageElementName": "编辑",
-    "pageElementCode": "route_definition:edit",
-    "pageElementType": "button",
-    "pageCode": "route_definition",
     "status": "ENABLED"
   }
 ]

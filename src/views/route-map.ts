@@ -1,18 +1,25 @@
 /**
- * 视图路由映射（模板项目）
- *
+ * 视图路由映射
  * 仅注册「模板内已有」的示例页面，不包含具体业务系统的页面。
  * 从本模板生成新项目后，在此补充 views 下的页面与 linkPath 的映射即可。
  */
+
+import type { RouteRecordRaw } from 'vue-router';
+import { t } from '@platform/i18n';
 
 export interface ViewRouteConfig {
   component: () => Promise<unknown>;
   name?: string;
   meta: {
-    title: string;
+    titleKey: string;
+    titleDefault: string;
     requiresAuth: boolean;
     showInHome?: boolean;
   };
+}
+
+function resolveRouteTitle(meta: ViewRouteConfig['meta']): string {
+  return t(meta.titleKey, meta.titleDefault);
 }
 
 /** 路由路径 -> 视图配置
@@ -23,28 +30,61 @@ export const routeMap: Record<string, ViewRouteConfig> = {
   '/g2rain_raindrop': {
     component: () => import('@/views/g2rain_raindrop/index.vue'),
     name: 'G2rainRaindrop',
-    meta: { title: 'g2rain_raindrop', requiresAuth: true, showInHome: true },
+    meta: {
+      titleKey: 'INFRA_ROUTE_G2RAIN_RAINDROP',
+      titleDefault: '发号器',
+      requiresAuth: true,
+      showInHome: true,
+    },
   },
   '/dictionary_usage': {
     component: () => import('@/views/dictionary_usage/index.vue'),
     name: 'DictionaryUsage',
-    meta: { title: 'dictionary_usage', requiresAuth: true, showInHome: true },
+    meta: {
+      titleKey: 'INFRA_ROUTE_DICTIONARY_USAGE',
+      titleDefault: '字典用途',
+      requiresAuth: true,
+      showInHome: true,
+    },
   },
   '/locale_setting': {
     component: () => import('@/views/locale_setting/index.vue'),
     name: 'LocaleSetting',
-    meta: { title: 'locale_setting', requiresAuth: true, showInHome: true },
+    meta: {
+      titleKey: 'INFRA_ROUTE_LOCALE_SETTING',
+      titleDefault: '地区语言',
+      requiresAuth: true,
+      showInHome: true,
+    },
   },
   '/i18n_message': {
     component: () => import('@/views/i18n_message/index.vue'),
     name: 'I18nMessage',
-    meta: { title: 'i18n_message', requiresAuth: true, showInHome: true },
-  }
+    meta: {
+      titleKey: 'INFRA_ROUTE_I18N_MESSAGE',
+      titleDefault: '国际化信息',
+      requiresAuth: true,
+      showInHome: true,
+    },
+  },
 };
 
-export function getRouteComponent(
-  routePath: string,
-): (() => Promise<unknown>) | undefined {
+export function getRouteConfig(): RouteRecordRaw[] {
+  return Object.entries(routeMap).map(([path, config]) => {
+    const { component, name, meta } = config;
+    return {
+      path,
+      name,
+      component,
+      meta: {
+        ...meta,
+        title: resolveRouteTitle(meta),
+      },
+    } as RouteRecordRaw;
+  });
+}
+
+export function getRouteComponent(routePath: string): (() => Promise<unknown>) | undefined {
   return routeMap[routePath]?.component;
 }
 
@@ -58,8 +98,7 @@ export function getHomeRoutes(): Array<{ path: string; title: string; name?: str
     })
     .map(([path, config]) => ({
       path,
-      title: config.meta.title,
+      title: resolveRouteTitle(config.meta),
       name: config.name,
     }));
 }
-

@@ -8,7 +8,7 @@
             <el-select
               v-if="showLocaleSelect"
               v-model="selectedLocale"
-              placeholder="选择语言"
+              :placeholder="$t('G2_PH_LANG', '选择语言')"
               filterable
               class="locale-select"
               :disabled="!localeStore.initialized || localeStore.options.length === 0"
@@ -49,7 +49,7 @@
       <el-divider />
 
       <div v-if="homeRoutes.length > 0" class="routes-section">
-        <h3>功能入口</h3>
+        <h3>{{ $t('INFRA_HOME_ENTRIES', '功能入口') }}</h3>
         <div class="routes-grid">
           <el-card
             v-for="route in homeRoutes"
@@ -70,7 +70,7 @@
       </div>
 
       <div v-else class="empty-routes">
-        <el-empty description="暂无可用功能入口" :image-size="100" />
+        <el-empty :description="$t('INFRA_HOME_NO_ENTRY', '暂无可用功能入口')" :image-size="100" />
       </div>
     </el-card>
   </div>
@@ -99,14 +99,17 @@ const selectedLocale = computed({
   },
 });
 
-const homeRoutes = computed(() => getHomeRoutes());
+const homeRoutes = computed(() => {
+  void localeStore.locale;
+  return getHomeRoutes();
+});
 
 const goToRoute = (path: string) => {
   router.push(path);
 };
 
 const showDemoMessage = () => {
-  ElMessage.success(t('INFRA_HOME_DEMO_SUCCESS', '操作成功'));
+  ElMessage.success(t('G2_MSG_DEMO_OK', '操作成功'));
 };
 </script>
 

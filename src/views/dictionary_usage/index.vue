@@ -5,17 +5,17 @@
       <!-- 基础查询表单（BaseSelectListDto） -->
       <QueryForm ref="queryFormRef" v-model="baseQueryForm" @search="handleSearch">
         <!-- 业务特定查询字段 -->
-        <el-form-item label="用途编码">
-          <el-input v-model="queryForm.usageCode" placeholder="请输入用途编码" clearable style="width: 200px" />
+        <el-form-item :label="$t('INFRA_DICTIONARY_USAGE_FIELD_CODE', '用途编码')">
+          <el-input v-model="queryForm.usageCode" :placeholder="$t('INFRA_DICTIONARY_USAGE_PH_CODE', '请输入用途编码')" clearable style="width: 200px" />
         </el-form-item>
-        <el-form-item label="用途名称">
-          <el-input v-model="queryForm.usageName" placeholder="请输入用途名称" clearable style="width: 200px" />
+        <el-form-item :label="$t('INFRA_DICTIONARY_USAGE_FIELD_NAME', '用途名称')">
+          <el-input v-model="queryForm.usageName" :placeholder="$t('INFRA_DICTIONARY_USAGE_PH_NAME', '请输入用途名称')" clearable style="width: 200px" />
         </el-form-item>
         <!-- 操作按钮 -->
         <template #actions>
           <el-form-item>
-            <el-button type="primary" @click="handleSearch">查询</el-button>
-            <el-button @click="handleReset">重置</el-button>
+            <el-button type="primary" @click="handleSearch">{{ $t('G2_BTN_QUERY', '查询') }}</el-button>
+            <el-button @click="handleReset">{{ $t('G2_BTN_RESET', '重置') }}</el-button>
           </el-form-item>
         </template>
       </QueryForm>
@@ -24,28 +24,28 @@
     <!-- 标题和操作按钮 -->
     <div class="dictionary_usage-page__header">
       <div class="dictionary_usage-page__title-group">
-        <h2>管理字典用途数据</h2>
+        <h2>{{ $t('INFRA_DICTIONARY_USAGE_TITLE', '管理字典用途数据') }}</h2>
       </div>
-      <el-button type="primary" v-permission="'dictionary_usage:add'" @click="handleCreate">新增字典用途</el-button>
+      <el-button type="primary" v-permission="'dictionary_usage:add'" @click="handleCreate">{{ $t('INFRA_DICTIONARY_USAGE_BTN_ADD', '新增字典用途') }}</el-button>
     </div>
 
     <SortableTable :data="tableData" border stripe style="width: 100%" :enable-multi-sort="true" @sort-change="handleSortChange">
-      <el-table-column prop="id" label="用途标识" width="210" />
-      <el-table-column prop="usageCode" label="用途编码" width="210" />
-      <el-table-column prop="usageName" label="用途名称" width="210" />
-      <el-table-column prop="description" label="描述" width="280" />
-      <TableColumn prop="createTime" label="创建时间" width="180" :sortable="true" />
-      <TableColumn prop="updateTime" label="更新时间" width="180" :sortable="true" />
-      <el-table-column label="操作" fixed="right" width="210">
+      <el-table-column prop="id" :label="$t('INFRA_DICTIONARY_USAGE_COL_ID', '用途标识')" width="210" />
+      <el-table-column prop="usageCode" :label="$t('INFRA_DICTIONARY_USAGE_FIELD_CODE', '用途编码')" width="210" />
+      <el-table-column prop="usageName" :label="$t('INFRA_DICTIONARY_USAGE_FIELD_NAME', '用途名称')" width="210" />
+      <el-table-column prop="description" :label="$t('G2_FIELD_DESC', '描述')" width="280" />
+      <TableColumn prop="createTime" :label="$t('G2_FIELD_CREATE_TIME', '创建时间')" width="180" :sortable="true" />
+      <TableColumn prop="updateTime" :label="$t('G2_FIELD_UPDATE_TIME', '更新时间')" width="180" :sortable="true" />
+      <el-table-column :label="$t('G2_FIELD_ACTION', '操作')" fixed="right" width="210">
         <template #default="{ row }">
-          <el-button type="primary" link size="small" @click="handleView(row)">明细</el-button>
-          <el-button type="primary" v-permission="'dictionary_usage:items'" link size="small" @click="openDictionaryItems(row)">字典项</el-button>
-          <el-button type="primary" v-permission="'dictionary_usage:edit'" link size="small" @click="handleEdit(row)">编辑</el-button>
-          <el-button type="danger" v-permission="'dictionary_usage:delete'" link size="small" @click="handleDelete(row)">删除</el-button>
+          <el-button type="primary" link size="small" @click="handleView(row)">{{ $t('G2_BTN_DETAIL', '明细') }}</el-button>
+          <el-button type="primary" v-permission="'dictionary_usage:items'" link size="small" @click="openDictionaryItems(row)">{{ $t('INFRA_DICTIONARY_USAGE_BTN_ITEMS', '字典项') }}</el-button>
+          <el-button type="primary" v-permission="'dictionary_usage:edit'" link size="small" @click="handleEdit(row)">{{ $t('G2_BTN_EDIT', '编辑') }}</el-button>
+          <el-button type="danger" v-permission="'dictionary_usage:delete'" link size="small" @click="handleDelete(row)">{{ $t('G2_BTN_DELETE', '删除') }}</el-button>
         </template>
         <template #header>
           <div style="display: flex; align-items: center; gap: 8px;">
-            <span>操作</span>
+            <span>{{ $t('G2_FIELD_ACTION', '操作') }}</span>
             <SortManagerButton />
           </div>
         </template>
@@ -66,39 +66,39 @@
     </div>
 
     <!-- 新增 / 编辑弹窗 -->
-    <el-dialog v-model="editDialogVisible" :title="isEdit ? '编辑字典用途' : '新增字典用途'" width="520px">
+    <el-dialog v-model="editDialogVisible" :title="editDialogTitle" width="520px">
       <el-form ref="editFormRef" :model="editForm" :rules="editRules" label-width="100px">
-        <el-form-item label="用途编码" prop="usageCode">
-          <el-input v-model="editForm.usageCode" placeholder="请输入用途编码" />
+        <el-form-item :label="$t('INFRA_DICTIONARY_USAGE_FIELD_CODE', '用途编码')" prop="usageCode">
+          <el-input v-model="editForm.usageCode" :placeholder="$t('INFRA_DICTIONARY_USAGE_PH_CODE', '请输入用途编码')" />
         </el-form-item>
-        <el-form-item label="用途名称" prop="usageName">
-          <el-input v-model="editForm.usageName" placeholder="请输入用途名称" />
+        <el-form-item :label="$t('INFRA_DICTIONARY_USAGE_FIELD_NAME', '用途名称')" prop="usageName">
+          <el-input v-model="editForm.usageName" :placeholder="$t('INFRA_DICTIONARY_USAGE_PH_NAME', '请输入用途名称')" />
         </el-form-item>
-        <el-form-item label="描述" prop="description">
-          <el-input v-model="editForm.description" placeholder="请输入描述" />
+        <el-form-item :label="$t('G2_FIELD_DESC', '描述')" prop="description">
+          <el-input v-model="editForm.description" :placeholder="$t('G2_PH_DESC', '请输入描述')" />
         </el-form-item>
       </el-form>
       <template #footer>
         <span class="dialog-footer">
-          <el-button @click="editDialogVisible = false">取 消</el-button>
-          <el-button type="primary" @click="submitEdit">保 存</el-button>
+          <el-button @click="editDialogVisible = false">{{ $t('G2_BTN_CANCEL', '取消') }}</el-button>
+          <el-button type="primary" @click="submitEdit">{{ $t('G2_BTN_SAVE', '保存') }}</el-button>
         </span>
       </template>
     </el-dialog>
 
     <!-- 明细弹窗 -->
-    <el-dialog v-model="detailDialogVisible" title="字典用途明细" width="520px">
+    <el-dialog v-model="detailDialogVisible" :title="$t('INFRA_DICTIONARY_USAGE_DETAIL', '字典用途明细')" width="520px">
       <el-descriptions :column="1" border>
-        <el-descriptions-item label="用途标识">{{ currentRow?.id }}</el-descriptions-item>
-        <el-descriptions-item label="用途编码">{{ currentRow?.usageCode }}</el-descriptions-item>
-        <el-descriptions-item label="用途名称">{{ currentRow?.usageName }}</el-descriptions-item>
-        <el-descriptions-item label="描述">{{ currentRow?.description }}</el-descriptions-item>
-        <el-descriptions-item label="创建时间">{{ currentRow?.createTime }}</el-descriptions-item>
-        <el-descriptions-item label="更新时间">{{ currentRow?.updateTime }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('INFRA_DICTIONARY_USAGE_COL_ID', '用途标识')">{{ currentRow?.id }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('INFRA_DICTIONARY_USAGE_FIELD_CODE', '用途编码')">{{ currentRow?.usageCode }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('INFRA_DICTIONARY_USAGE_FIELD_NAME', '用途名称')">{{ currentRow?.usageName }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('G2_FIELD_DESC', '描述')">{{ currentRow?.description }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('G2_FIELD_CREATE_TIME', '创建时间')">{{ currentRow?.createTime }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('G2_FIELD_UPDATE_TIME', '更新时间')">{{ currentRow?.updateTime }}</el-descriptions-item>
       </el-descriptions>
       <template #footer>
         <span class="dialog-footer">
-          <el-button type="primary" @click="detailDialogVisible = false">关 闭</el-button>
+          <el-button type="primary" @click="detailDialogVisible = false">{{ $t('G2_BTN_CLOSE', '关闭') }}</el-button>
         </span>
       </template>
     </el-dialog>
@@ -113,6 +113,7 @@
 import { ref, reactive, onMounted, computed } from 'vue';
 import type { FormInstance, FormRules } from 'element-plus';
 import { ElMessage, ElMessageBox } from 'element-plus';
+import { t } from '@platform/i18n';
 import { DictionaryUsageApi } from './api';
 import type { DictionaryUsage, DictionaryUsagePayload, DictionaryUsageQuery } from './type';
 import type { PageSelectListDto } from '@platform/types/api.type';
@@ -165,8 +166,9 @@ const loadData = async () => {
     // 设置响应结果 
     tableData.value = pageData.records;
     pagination.total = pageData.total;
-  } catch (error: any) {
-    showErrorMessage(error || '加载列表失败');
+  } catch (error: unknown) {
+    const msg = error instanceof Error ? error.message : t('G2_MSG_LOAD_FAIL', '加载列表失败');
+    showErrorMessage(msg);
   }
 };
 
@@ -224,9 +226,11 @@ const handleView = (row: DictionaryUsage) => {
 
 // 删除数据记录
 const handleDelete = (row: DictionaryUsage) => {
-  ElMessageBox.confirm(`确认删除字典用途「${row.id}」吗？`, '提示', {
-    type: 'warning',
-  })
+  ElMessageBox.confirm(
+    t('INFRA_DICTIONARY_USAGE_DEL_CONFIRM', `确认删除字典用途「${row.id}」吗？`),
+    t('G2_LBL_TIP', '提示'),
+    { type: 'warning' },
+  )
     .then(async () => {
       try {
         await DictionaryUsageApi.remove(row.id);
@@ -235,9 +239,10 @@ const handleDelete = (row: DictionaryUsage) => {
           pagination.pageNum--;
         }
         await loadData();
-        ElMessage.success('删除成功');
-      } catch (error: any) {
-        showErrorMessage(error || '删除失败');
+        ElMessage.success(t('G2_MSG_DELETE_OK', '删除成功'));
+      } catch (error: unknown) {
+        const msg = error instanceof Error ? error.message : t('G2_MSG_DELETE_FAIL', '删除失败');
+        showErrorMessage(msg);
       }
     })
     .catch(() => {});
@@ -260,11 +265,15 @@ const editForm = reactive({
   description: '',
 });
 
+const editDialogTitle = computed(() =>
+  isEdit.value ? t('INFRA_DICTIONARY_USAGE_DLG_EDIT', '编辑字典用途') : t('INFRA_DICTIONARY_USAGE_DLG_ADD', '新增字典用途'),
+);
+
 // 表单校验规则 
-const editRules: FormRules = {
-  usageCode: [{ required: true, message: '请输入用途编码', trigger: 'blur' }],
-  usageName: [{ required: true, message: '请输入用途名称', trigger: 'blur' }],
-};
+const editRules = computed<FormRules>(() => ({
+  usageCode: [{ required: true, message: t('INFRA_DICTIONARY_USAGE_VLD_CODE', '请输入用途编码'), trigger: 'blur' }],
+  usageName: [{ required: true, message: t('INFRA_DICTIONARY_USAGE_VLD_NAME', '请输入用途名称'), trigger: 'blur' }],
+}));
 
 // 打开创建弹窗
 const handleCreate = () => {
@@ -307,11 +316,12 @@ const submitEdit = async () => {
       payload.id = editForm.id;
     }
     await DictionaryUsageApi.save(payload);
-    ElMessage.success(isEdit.value ? '更新成功' : '新增成功');
+    ElMessage.success(isEdit.value ? t('G2_MSG_UPDATE_OK', '更新成功') : t('G2_MSG_ADD_OK', '新增成功'));
     await loadData();
     editDialogVisible.value = false;
-  } catch (error: any) {
-    showErrorMessage(error || '保存失败');
+  } catch (error: unknown) {
+    const msg = error instanceof Error ? error.message : t('G2_MSG_SAVE_FAIL', '保存失败');
+    showErrorMessage(msg);
   }
 };
 
@@ -320,7 +330,9 @@ const itemDrawerUsageCode = ref('');
 const itemDrawerLabel = ref('');
 
 const itemDrawerTitle = computed(() =>
-  itemDrawerLabel.value ? `字典项 — ${itemDrawerLabel.value}` : '字典项',
+  itemDrawerLabel.value
+    ? t('INFRA_DICTIONARY_USAGE_DRAWER_ITEMS', `字典项 — ${itemDrawerLabel.value}`)
+    : t('INFRA_DICTIONARY_USAGE_LBL_ITEMS', '字典项'),
 );
 
 const openDictionaryItems = (row: DictionaryUsage) => {
@@ -386,4 +398,3 @@ onMounted(() => {
   margin-top: 16px;
 }
 </style>
-

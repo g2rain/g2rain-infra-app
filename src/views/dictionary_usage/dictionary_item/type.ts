@@ -8,9 +8,9 @@ import type { BaseSelectListDto, BaseVo } from '@platform/types/api.type';
  * dictionary_item接口
  */
 export interface DictionaryItem extends BaseVo {
-  parentId: number;
+  parentId?: number;
   parentName?: string;
-  dictionaryUsageId: number;
+  usageCode?: string;
   code: string;
   name: string;
   description: string;
@@ -30,11 +30,11 @@ export interface DictionaryItemTree extends DictionaryItem {
 export interface DictionaryItemPayload {
   id?: number; // 更新时传入 ID，新增时不传
   parentId?: number;
-  dictionaryUsageId?: number;
+  usageCode?: string;
   code?: string;
   name?: string;
-  description?: string;
   sortIndex?: number;
+  description?: string;
 }
 
 /**
@@ -45,9 +45,7 @@ export interface DictionaryItemPayload {
 export interface DictionaryItemQuery extends BaseSelectListDto {
   // 业务查询字段
   parentId?: number;
-  dictionaryUsageId?: number;
+  usageCode?: string;
   code?: string;
   name?: string;
-  description?: string;
-  sortIndex?: number;
 }

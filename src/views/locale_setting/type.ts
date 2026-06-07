@@ -8,11 +8,10 @@ import type { BaseSelectListDto, BaseVo } from '@platform/types/api.type';
  * locale_setting接口
  */
 export interface LocaleSetting extends BaseVo {
-  languageCode: string;
-  regionCode: string;
   code: string;
   name: string;
   description: string;
+  sortIndex: number;
 }
 
 /**
@@ -20,11 +19,10 @@ export interface LocaleSetting extends BaseVo {
  */
 export interface LocaleSettingPayload {
   id?: number; // 更新时传入 ID，新增时不传
-  languageCode?: string;
-  regionCode?: string;
   code?: string;
   name?: string;
   description?: string;
+  sortIndex?: number;
 }
 
 /**
@@ -34,10 +32,7 @@ export interface LocaleSettingPayload {
  */
 export interface LocaleSettingQuery extends BaseSelectListDto {
   // 业务查询字段
-  languageCode?: string;
-  regionCode?: string;
   code?: string;
   name?: string;
-  description?: string;
 }
 

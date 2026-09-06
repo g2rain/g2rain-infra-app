@@ -1,760 +1,283 @@
+﻿<p align="center">
+  <img src="https://github.com/g2rain.png" alt="G2Rain" width="180" />
+</p>
+
 # g2rain-infra-app
 
-[![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
+[![Vue](https://img.shields.io/badge/Vue-3.5.26-42B883?logo=vuedotjs&logoColor=white)](https://vuejs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.9.3-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Vite](https://img.shields.io/badge/Vite-7.3.0-646CFF?logo=vite&logoColor=white)](https://vite.dev/)
+[![Qiankun](https://img.shields.io/badge/micro--frontend-Qiankun-1677FF)](https://qiankun.umijs.org/)
 
-基于 Vue 3 + TypeScript + Vite + Element Plus + qiankun 的微前端子应用，支持作为子应用被主应用加载，或独立运行。
+> 下一代AI软件开发范式，AI原生Agent平台，开源的企业级SaaS底座。
 
-**生态**：主壳 [g2rain-main-shell](https://github.com/g2rain/g2rain-main-shell)；通用子应用官方模板 [g2rain-app-template](https://github.com/g2rain/g2rain-app-template) 与脚手架 [create-g2rain-app](https://github.com/g2rain/g2rain-app-cli)。**本仓库**侧重 G2rain **基建 / 平台能力**方向的 qiankun 子应用实现，与通用模板并存，可按需选用。
+平台基础设施管理微前端子应用，提供发号器、字典、地区语言与国际化消息管理界面，并以动态资源路由和 qiankun 生命周期接入 g2rain-main-shell。
 
-## 📋 目录
+[项目文档](docs/index.md) · [官网](https://www.g2rain.com) · [Issues](https://github.com/g2rain/g2rain/issues) · [Discussions](https://github.com/g2rain/g2rain/discussions)
 
-- [项目简介](#项目简介)
-- [技术栈](#技术栈)
-- [核心特性](#核心特性)
-- [快速开始](#快速开始)
-- [环境配置](#环境配置)
-- [qiankun 集成](#qiankun-集成)
-- [路由配置](#路由配置)
-- [Vite 配置](#vite-配置)
-- [Dockerfile 镜像生成](#dockerfile-镜像生成)
-- [构建与部署](#构建与部署)
-- [常见问题](#常见问题)
-- [项目结构](#-项目结构)
-- [代码规范](#-代码规范)
-- [贡献指南](#-贡献指南)
-- [许可证](#-许可证)
-- [联系我们](#-联系我们)
-- [致谢](#-致谢)
+## 目录
 
-## 🎯 项目简介
+- 项目简介
+- 平台定位
+- 应用角色
+- 功能概览
+- 技术栈
+- 环境要求
+- 快速开始
+- 配置说明
+- 双运行模式
+- 页面代码生成
+- 资源配置生成
+- 构建与镜像
+- 代码质量与测试
+- 运行示例
+- 主要页面与后端接口
+- 安全边界
+- 故障排查
+- 与关联仓库的关系
+- 模块说明
+- 职责边界
+- 参与贡献
+- 许可证
+- 联系我们
+- 致谢
 
-g2rain-infra-app 提供以下核心能力：
+## 项目简介
 
-- **qiankun 子应用支持**：支持作为子应用被主应用加载，或独立运行
-- **Token 管理**：从主应用接收 token，自动初始化 token store
-- **子应用隔离**：子应用环境下自动禁用 token 持久化，避免与主应用冲突
-- **SSO/DPoP Token 管理**：支持 SSO 单点登录和 DPoP 协议
-- **安全签名**：使用 ES256 算法进行请求签名，确保 API 安全
+`g2rain-infra-app` 是 `g2rain-infra` 的管理端前端，面向平台管理员提供发号器、字典用途与字典项、地区语言和国际化消息维护。应用从 Basis 加载页面资源，在集成模式下由 main-shell 装载，在独立模式下自行完成 IAM SSO，并统一经 Gateway 调用 Infra 后端。
 
-## 🛠 技术栈
+## 平台定位
 
-### 前端技术栈
+该仓库位于 g2rain 前端应用层，属于 `frontend-foundation-app`，目标采用中央 `frontend-app 1.0.0`（固定快照 `architecture-v1.1.0`）。它不是 main-shell，也不承担后端基础设施服务职责。
 
-- **框架**：Vue 3.3.4 + TypeScript 5.4.5
-- **构建工具**：Vite 5.0.0
-- **微前端**：qiankun 2.10.14
-- **UI 组件库**：Element Plus 2.4.3
-- **状态管理**：Pinia 2.1.7 + pinia-plugin-persistedstate 3.2.1
-- **路由**：Vue Router 4.2.5
-- **HTTP 客户端**：Axios 1.12.2
-- **加密库**：jose 6.1.0、crypto-js 4.2.0、elliptic 6.6.1
+## 应用角色
 
-### 后端技术栈（可选）
+该仓库聚焦于平台基础设施配置的管理端交互。
 
-- **Web 服务器**：OpenResty (Nginx + Lua)
-- **Lua 库**：lua-resty-openssl（ES256 签名支持）
-- **签名算法**：ES256 (ECDSA P-256 + SHA-256)
+主要流程包括：
+- 从 Basis 加载资源并与本地路由映射注册流程
+- 子应用挂载与卸载生命周期流程
+- 子应用路由同步流程
+- 令牌请求、响应与失效事件流程
+- Qiankun 运行时初始化与 `appKey` 多实例隔离流程
 
----
+## 功能概览
 
-## ✨ 核心特性
+| 能力 | 说明 |
+| --- | --- |
+| 分布式发号器管理 | 提供发号器配置页面，维护平台统一编号生成能力。 |
+| 字典用途管理 | 维护字典用途及字典项的本地化选项。 |
+| 地区语言配置 | 维护平台支持的地区与语言配置。 |
+| 国际化信息管理 | 维护多语言消息并为平台应用提供国际化资源。 |
+| 平台运行时接入 | 支持动态资源路由、认证态、国际化与 qiankun 子应用生命周期。 |
 
-### 1. 双模式运行
+## 技术栈
 
-项目支持两种运行模式：
+| 类别 | 说明 |
+| --- | --- |
+| 运行时 | Node.js 22+、npm |
+| 前端框架 | vue、vue-router、pinia、vue-i18n、element-plus |
+| 构建与类型 | vite、typescript、vue-tsc |
+| 微前端 | qiankun、vite-plugin-qiankun |
+| 接口与模拟 | axios、mockjs、vite-plugin-mock |
+| 部署 | Docker、Nginx |
 
-1. **独立运行模式**：
-   - 直接访问子应用 URL
-   - Token 会持久化到 localStorage
-   - 支持完整的 SSO 登录流程
+## 环境要求
 
-2. **子应用模式**：
-   - 被主应用通过 qiankun 加载
-   - Token 由主应用通过 props 传递
-   - 自动禁用 token 持久化，避免与主应用冲突
+- Node.js >=22
+- npm
+- Docker（构建镜像时需要）
 
-系统会自动检测 `window.__POWERED_BY_QIANKUN__` 来判断运行模式。
+## 快速开始
 
-### 2. Token 管理
+| 步骤 | 命令或位置 | 说明 |
+| --- | --- | --- |
+| 安装依赖 | `npm ci --legacy-peer-deps` | 按 `package-lock.json` 安装可复现依赖。 |
+| 本地开发 | `npm run dev` | 启动本地开发服务；默认 Context Path 为 `/infra`。 |
+| 构建产物 | `npm run build` | 执行类型检查与前端构建，生成可发布产物。 |
+| 预览产物 | `npm run preview` | 在本地预览构建后的前端产物。 |
+| 页面生成 | `npm run build:generate -- --tables=<table>` | 根据仓库内 DDL 生成页面骨架；执行前先检查 Git 状态。 |
+| 资源生成 | `npm run build:config` | 从静态路由和权限指令生成页面/页面元素 JSON。 |
 
-**代码位置**：`src/store/modules/token.ts`
+版本号以项目构建配置为准，当前识别为 `0.1.0`。
 
-- **子应用模式**：从主应用接收 token，不持久化
-- **独立运行模式**：正常持久化到 localStorage
-- 自动验证 token 有效性
-- 支持 token 自动刷新
+## 配置说明
 
-### 3. qiankun 生命周期
+所有 `VITE_*` 与 `window._env_` 配置都对浏览器可见，不能存放 Secret。
 
-**代码位置**：`src/main.ts`、`src/qiankun.ts`
+| 类别 | 配置项 | 说明 |
+| --- | --- | --- |
+| 应用 | `VITE_APPLICATION_CODE` | Basis 资源加载使用的应用编码，当前为 `g2rain-infra-app`。 |
+| 路径 | `VITE_CONTEXT_PATH` | Vite base 与部署子路径，当前为 `/infra`。 |
+| 模式 | `VITE_RUN_MODE` | `alone` 表示独立模式，空值表示集成意图；URL `mode=alone` 优先。 |
+| 平台 | `VITE_SSO_BASE_URL`、`VITE_REDIRECT_URI` | 独立模式 SSO 与回调地址。 |
+| 平台 | `VITE_MAIN_SHELL_REDIRECT_PREFIX`、`VITE_MAIN_SHELL_ORIGIN` | 集成意图下的 main-shell 直链网关。 |
+| 国际化 | `VITE_I18N_TAGS` | 后端国际化消息 Tag，默认项目配置为 `G2RAIN_SHARED,INFRA`。 |
+| 开发 | `VITE_BACKEND_ORIGIN`、`VITE_SERVER_PORT`、`VITE_MOCK_ENABLED` | 本地代理、端口与显式 Mock 开关。 |
+| 容器 | `SERVER_PORT`、`CONTEXT_PATH` | OpenResty 监听端口与部署子路径。 |
+| 容器 | `GATEWAY_HOST/PORT`、`IAM_HOST/PORT` | `/api/`、`/doc/` 与 `/auth/` 的代理目标。 |
 
-```typescript
-// 导出 qiankun 生命周期函数
-export async function bootstrap() { ... }
-export async function mount(props: QiankunProps) { ... }
-export async function unmount() { ... }
-export async function update(props: QiankunProps) { ... }
-```
+完整说明见[配置文档](docs/operations/configuration.md)。
 
-在 `mount` 生命周期中自动接收主应用传递的 token 并初始化。
+## 双运行模式
 
----
+### 集成模式（正式入口）
 
-## 🚀 快速开始
+main-shell 通过 qiankun 提供容器、唯一 `appKey`、Token、Client、Locale、初始路由和 activeRule。应用先建立认证上下文，再从 `/basis/authority/resources` 加载页面资源；`update` 可处理 Token、语言、资源与路由变化，`unmount` 清理实例和 watcher。
 
-### 环境要求
+### 独立模式（开发与诊断）
 
-- Node.js >= 18
-- npm >= 9
-- Docker（可选，用于部署）
+在 URL 增加 `mode=alone`，或配置 `VITE_RUN_MODE=alone`。应用自行执行 IAM SSO、Token 和资源初始化。没有显式选择独立模式且未被 qiankun 挂载时，直链会跳转 main-shell 网关。
 
-### 安装依赖
+## 页面代码生成
 
-```bash
-npm install
-```
-
-### 本地开发
-
-1. **创建 `.env` 文件**：
-
-```env
-# 应用编码（必填）
-VITE_APPLICATION_CODE=g2rain-infra-app
-
-# 前端基础路径（根据主应用分配的路径修改）
-VITE_BASE_URL=/test/
-
-# 后端网关地址（必填）
-VITE_BACKEND_ORIGIN=http://localhost:8080
-
-# 应用上下文路径（nginx 分配的路径，如 /test）
-VITE_APPLICATION_CONTEXT=/test
-
-# IAM/认证服务地址（默认等于 VITE_BACKEND_ORIGIN）
-VITE_IAM_ORIGIN=http://localhost:8080
-
-# Token 相关接口（必填）
-VITE_REFRESH_TOKEN_URL=/auth/refresh-token
-VITE_GENERATE_TOKEN_URL=/auth/token
-
-# SSO 配置（必填）
-VITE_SSO_BASE_URL=https://sso.example.com
-VITE_AUTH_END_POINT=/auth/authorize
-VITE_REDIRECT_URI=http://localhost:3000/test/sso_callback
-
-# 开发服务器端口（可选）
-VITE_SERVER_PORT=3000
-```
-
-> **⚠️ 重要提示**：
-> - `VITE_BASE_URL` 和 `VITE_REDIRECT_URI` 中的 `/test/` 是示例路径，请根据主应用分配的实际路径修改
-> - `VITE_APPLICATION_CONTEXT` 需要与 nginx 配置中的应用路径一致
-> - 创建项目后请务必修改这些路径配置，避免 SSO 回调或资源路径错误
-
-2. **启动开发服务器**：
+生成器从 `src/shared/generator/database.sql` 读取 MySQL DDL：
 
 ```bash
-npm run dev
+npm run build:generate -- --tables=g2rain_raindrop
 ```
 
-3. **访问应用**：
+多个表可使用逗号分隔。默认生成/覆盖 `src/views/<table>` 下的 `index.vue`、`api.ts`、`type.ts`、`mock.ts`，并更新 `src/views/route-map.ts`。可使用 `--no-view`、`--no-api`、`--no-mock`、`--no-route` 关闭阶段。
 
-- 独立运行：打开浏览器访问 `http://localhost:3000`
-- 子应用模式：由主应用加载，无需直接访问
+生成器会直接覆盖同名文件。执行前必须检查 Git 状态，生成后人工校正接口用例、Payload、ID、权限、国际化和敏感字段，再 Review Diff 并运行构建。详见[页面代码生成](docs/development/code-generation.md)。
 
-### 构建生产版本
+## 资源配置生成
 
 ```bash
-npm run build
+npm run build:config
 ```
 
-构建产物将输出到 `dist/` 目录。
+当前命令扫描 `src/views/route-map.ts` 和路由目录中的静态 `v-permission`，写入：
 
-### TypeScript 输出约束
+- `src/shared/config-util/config/resources.json`
+- `src/shared/config-util/config/pages.json`
+- `src/shared/config-util/config/page-elements.json`
 
-- 项目已启用 `tsconfig.json` 中的 `noEmit: true`。
-- 本地开发和构建过程中，TypeScript 不应在 `src/` 目录生成 `.js` / `.js.map` 文件。
-- 若历史文件已存在，可在项目根目录执行清理：
+API parser 当前没有接入主流程，`apiEndpoints` 为空，也不会生成 `api-endpoints.json`。动态路由和动态权限表达式可能无法识别；任何 JSON 删除都必须人工判断是资源下线还是扫描失败。详见[资源配置生成](docs/development/resource-generation.md)。
 
-```bash
-Get-ChildItem -Path .\src -Recurse -File -Include *.js,*.js.map | Remove-Item -Force
-```
+## 构建与镜像
 
-### 预览构建产物
+| 目标 | 命令 | 产物 | 说明 |
+| --- | --- | --- | --- |
+| 本地开发 | `npm run dev` | 本地开发服务 | 启动前端本地开发服务。 |
+| 前端产物 | `npm run build` | `dist` | 执行类型检查与 Vite/TypeScript 构建，生成可发布产物。 |
+| 产物预览 | `npm run preview` | 本地预览服务 | 在本地预览构建后的前端静态产物。 |
+| 容器镜像 | `docker build --build-arg VITE_BUILD_MODE=production -t g2rain/g2rain-infra-app:<tag> .` | OpenResty 前端镜像 | 构建静态产物、反向代理和 Lua 签名运行环境。 |
+| 构建脚本 | `./build.sh --tag <tag> --build-mode production` | `g2rain/g2rain-infra-app:<tag>` | 封装 Docker BuildKit 镜像构建。 |
 
-```bash
-npm run preview
-```
+## 代码质量与测试
 
----
+| 检查项 | 命令 | 说明 |
+| --- | --- | --- |
+| Vue 类型检查与生产打包 | `npm run build` | 依次执行 `vue-tsc` 与 Vite build。2026-09-05 在按锁文件安装依赖后验证通过。 |
 
-## ⚙️ 环境配置
+仓库当前没有 `test` 或 `lint` script，也未发现自动化测试文件。构建通过不等于页面、浏览器、认证、权限、微前端或容器联调通过。当前构建仍有循环分块、MockJS `eval`、经典 `env-config.js` 和约 1.63 MB 主包警告，详见[测试策略](docs/development/testing.md)与[架构偏差](docs/architecture/deviations.md)。
 
-### 环境变量说明
+## 运行示例
 
-| 变量名 | 说明 | 示例 | 必填 |
-|--------|------|------|------|
-| `VITE_APPLICATION_CODE` | 应用编码 | `g2rain-infra-app` | ✅ |
-| `VITE_BASE_URL` | 前端应用基础路径 | `/test/` 或 `/` | ❌ |
-| `VITE_BACKEND_ORIGIN` | 后端网关地址 | `http://localhost:8080` | ✅ |
-| `VITE_APPLICATION_CONTEXT` | 应用上下文路径（nginx） | `/test` 或 `/` | ❌ |
-| `VITE_IAM_ORIGIN` | IAM/认证服务地址 | `http://localhost:8080` | ❌ |
-| `VITE_REFRESH_TOKEN_URL` | Token 刷新接口路径 | `/auth/refresh-token` | ✅ |
-| `VITE_GENERATE_TOKEN_URL` | Token 生成接口路径 | `/auth/token` | ✅ |
-| `VITE_SSO_BASE_URL` | SSO 服务基础地址 | `https://sso.example.com` | ✅ |
-| `VITE_AUTH_END_POINT` | SSO 认证端点 | `/auth/authorize` | ✅ |
-| `VITE_REDIRECT_URI` | SSO 回调地址 | `http://localhost:3000/test/sso_callback` | ✅ |
-| `VITE_SERVER_PORT` | 开发服务器端口 | `3000` | ❌ |
+| 示例 | 方法 | 路径 | 用途 | 调用示例 |
+| --- | --- | --- | --- | --- |
+| 平台前端应用本地开发 | npm | `npm run dev` | 启动前端本地开发服务，便于联调页面、路由和平台运行时能力。 | `npm run dev -- --host 0.0.0.0` |
+| 平台前端应用构建 | npm | `npm run build` | 执行类型检查和前端构建，生成可部署的静态产物。 | `npm run build` |
+| 平台前端应用预览 | npm | `npm run preview` | 在本地预览构建后的前端产物。 | `npm run preview` |
 
-### 本地开发配置
+## 主要页面与后端接口
 
-本地开发时，环境变量通过 `.env` 文件配置，Vite 会自动读取并注入到 `import.meta.env`。
+| 页面路由 | 管理能力 | 代表性后端路径 |
+| --- | --- | --- |
+| `/g2rain_raindrop` | 发号器配置、业务 Tag 查询 | `/infra/g2rain_raindrop/page`、`/save`、`/{id}`、`/biz_tag_dict` |
+| `/dictionary_usage` | 字典用途及字典项维护 | `/infra/dictionary_usage/*`、`/infra/dictionary_item/list|page|tree|save|{id}` |
+| `/locale_setting` | 地区语言与语言国家选项 | `/infra/locale_setting/*`、`/locale_dict`、`/get_language_countries` |
+| `/i18n_message` | 国际化消息、用途与 Tag | `/infra/i18n_message/*`、`/i18n_message_usages`、`/tag_dict` |
 
-**代码位置**：`src/utils/env.ts`
+这些路径由浏览器 HTTP Client 经 Gateway 调用。具体请求方法、Payload 和权限以当前 `src/views/*/api.ts` 与后端契约为准。
 
-```typescript
-export const env = {
-  VITE_APPLICATION_CODE: getEnvVar('VITE_APPLICATION_CODE', 'g2rain-app'),
-  VITE_BASE_URL: getEnvVar('VITE_BASE_URL', '/'),
-  VITE_BACKEND_ORIGIN: getEnvVar('VITE_BACKEND_ORIGIN', 'http://localhost:8080'),
-  VITE_APPLICATION_CONTEXT: getEnvVar('VITE_APPLICATION_CONTEXT', '/'),
-  // ... 其他环境变量
-};
-```
-
-### Docker 部署配置
-
-Docker 部署时，环境变量需要在构建阶段通过 `--build-arg` 传入，Vite 会在构建时将环境变量打包到代码中。运行时环境变量已经内置在构建产物中，无需额外配置。
-
----
-
-## 🔗 qiankun 集成
-
-### 1. 主应用配置
-
-主应用在加载子应用时，需要传递以下 props：
-
-```typescript
-loadMicroApp({
-  name: 'g2rain-infra-app',
-  entry: '//localhost:3000',  // 或生产环境地址
-  container: '#container',
-  props: {
-    token: 'your-token-string',    // 必填：token 字符串
-    tokenKid: 'your-token-kid'     // 必填：token 的 kid (key id)
-  }
-})
-```
+## 安全边界
 
-### 2. 子应用接收 Token
+- `VITE_*`、`window._env_` 和前端 Bundle 都是公开边界，不存放 Token、私钥或生产 Secret。
+- 页面路由和 `v-permission` 只控制前端呈现，最终鉴权、租户与数据权限由 Gateway 和服务端执行。
+- DPoP 必须覆盖实际方法、URL、参数和请求体字节；签名私钥通过受控 Secret/Volume 提供。
+- qiankun 多实例使用唯一 `appKey` 隔离状态，并在 unmount 清理监听与 watcher。
+- 当前 `hasApiPermission` 固定返回 `true`，不能将前端 API 资源检查描述为已启用。
 
-**代码位置**：`src/qiankun.ts`
+详见[安全边界](docs/security/security-boundaries.md)。
 
-子应用在 `mount` 生命周期中自动接收并初始化 token：
+## 故障排查
 
-```typescript
-export async function mount(props: QiankunProps) {
-  console.log('[qiankun] 子应用挂载', props);
-  
-  // 初始化 token store（从主应用传递的 props 中获取 token）
-  await initTokenFromProps(props);
-  
-  // 渲染 Vue 应用
-  render(props.container);
-}
-```
-
-### 3. Token Store 配置
-
-**代码位置**：`src/store/modules/token.ts`
-
-子应用环境下自动禁用 token 持久化：
-
-```typescript
-persist: (window as any).__POWERED_BY_QIANKUN__
-  ? false // 子应用不进行 token 持久化
-  : {
-      key: STORAGE_KEY,
-      storage: localStorage,
-      paths: ['client', 'token', 'tokenString', 'logged'],
-    },
-```
-
-### 4. Props 接口定义
-
-**代码位置**：`src/qiankun.ts`
-
-```typescript
-export interface QiankunProps {
-  container?: HTMLElement;
-  token?: string;      // token 字符串
-  tokenKid?: string;  // token 的 kid (key id)
-  [key: string]: any;  // 允许其他自定义参数
-}
-```
-
----
-
-## 🛣️ 路由配置
-
-### 1. 路由定义
-
-**代码位置**：`src/router/index.ts`
-
-```typescript
-const routes: RouteRecordRaw[] = [
-  {
-    path: '/',
-    name: 'Home',
-    component: () => import('@/views/Home.vue'),
-    meta: { title: '首页', requiresAuth: true }
-  },
-  {
-    path: '/sso_callback',
-    name: 'SsoCallback',
-    component: () => import('@/views/SsoCallback.vue'),
-    meta: { title: 'SSO回调', requiresAuth: false }
-  },
-  // ... 其他路由
-];
-```
-
-### 2. 路由初始化
-
-```typescript
-const createAppRouter = () => {
-  return createRouter({
-    history: createWebHistory(env.VITE_BASE_URL),
-    routes
-  });
-};
-```
-
-### 3. 基础路径配置
-
-路由使用 `createWebHistory(env.VITE_BASE_URL)` 创建，支持配置基础路径：
-
-- 开发环境：`/`（默认）或 `/test/`（根据配置）
-- 生产环境：根据 `VITE_BASE_URL` 配置（如 `/test/`）
-
----
-
-## ⚙️ Vite 配置
-
-### 1. 本地开发环境配置
-
-**代码位置**：`vite.config.ts`
-
-```typescript
-export default defineConfig(({ mode }) => {
-  const env = loadEnv(mode, process.cwd(), '');
-  
-  const base = env.VITE_BASE_URL || '/';
-  const backendOrigin = env.VITE_BACKEND_ORIGIN || 'http://localhost:8080';
-  const backendContext = env.VITE_APPLICATION_CONTEXT || '';
-  const iamOrigin = env.VITE_IAM_ORIGIN || backendOrigin;
-  
-  const backendWithContext = trimSlashEnd(backendOrigin) + ensureLeadingSlash(trimSlashEnd(backendContext));
-  
-  return {
-    base,
-    server: {
-      host: '0.0.0.0',
-      port: parseInt(process.env.VITE_SERVER_PORT || '3000', 10),
-      open: true,
-      cors: true,
-      proxy: {
-        '/keys/iam-public-key': {
-          target: backendWithContext,
-          changeOrigin: true,
-        },
-        '/keys/iam-key-id': {
-          target: backendWithContext,
-          changeOrigin: true,
-        },
-        '/lua/sign_code': {
-          target: backendWithContext,
-          changeOrigin: true,
-        },
-        '/auth/': {
-          target: iamOrigin,
-          changeOrigin: true,
-          rewrite: (p) => p.replace(/^\/api\/auth/, '/auth'),
-        },
-        '/api': {
-          target: backendOrigin,
-          changeOrigin: true,
-        },
-      },
-    },
-    // ... 其他配置
-  };
-});
-```
-
-### 2. 生产环境配置
-
-生产环境通过环境变量 `VITE_BASE_URL` 配置基础路径：
-
-```bash
-# 例如：部署在 /test 路径下
-VITE_BASE_URL=/test/ npm run build
-```
-
-### 3. 环境变量注入
-
-**本地开发**：
-- 使用 `.env` 文件配置
-- Vite 自动读取并注入到 `import.meta.env`
-
-**生产环境（Docker）**：
-- 环境变量在构建时通过 Vite 的 `loadEnv` 注入到代码中
-- 构建时使用 `--mode` 参数指定环境模式（如 `production`）
-- 所有环境变量在构建时被打包到代码中，运行时直接使用 `import.meta.env` 访问
-
----
-
-## 🐳 Dockerfile 镜像生成
-
-### 1. 多阶段构建
-
-**代码位置**：`Dockerfile`
-
-#### 阶段 1：前端构建
-
-```dockerfile
-FROM node:20-alpine AS builder
-WORKDIR /app
-
-# 使用国内镜像加速
-RUN npm config set registry https://registry.npmmirror.com/
-
-# 复制依赖文件
-COPY package*.json ./
-
-# 安装依赖
-RUN npm install --legacy-peer-deps
-
-# 复制项目文件
-COPY . .
-
-# 设置构建模式和环境变量
-ARG VITE_BUILD_MODE=production
-ENV VITE_BUILD_MODE=$VITE_BUILD_MODE
-
-# 执行构建
-RUN npx vite build --mode $VITE_BUILD_MODE
-```
-
-#### 阶段 2：OpenResty 运行时
-
-```dockerfile
-FROM openresty/openresty:alpine
-
-# 安装构建依赖
-RUN apk add --no-cache \
-    curl git perl gettext ca-certificates openssl openssl-dev \
-    build-base bash unzip pkgconfig lua5.1-dev lua5.1 \
-    luarocks
-
-# 设置 Lua 路径
-ENV LUA_PATH="/usr/local/openresty/site/lualib/?.lua;/usr/local/openresty/site/lualib/?/init.lua;;"
-ENV LUA_CPATH="/usr/local/openresty/site/lualib/?.so;;"
-
-# 安装 luaossl（离线安装）
-COPY lua/luaossl-rel-20250929.tar.gz /tmp/
-RUN tar -xzf /tmp/luaossl-rel-20250929.tar.gz -C /tmp/luaossl-src && \
-    cd /tmp/luaossl-src/luaossl-rel-20250929 && \
-    make install5.1 LUA51PATH=/usr/local/openresty/site/lualib && \
-    make install5.2 LUA52PATH=/usr/local/openresty/site/lualib
-
-# 复制构建产物和配置文件
-COPY --from=builder /app/dist /usr/local/openresty/nginx/html
-COPY lua/ /usr/local/openresty/nginx/lua/
-COPY nginx/default.conf.template /etc/nginx/conf.d/
-COPY nginx/docker-entrypoint.sh /
-RUN chmod +x /docker-entrypoint.sh
-
-# 暴露端口
-EXPOSE 8080
-
-# 启动命令
-ENTRYPOINT ["/docker-entrypoint.sh"]
-CMD ["nginx", "-g", "daemon off;"]
-```
-
-### 2. 构建命令
-
-```bash
-# 基础构建
-docker build -t g2rain-infra-app .
-
-# 指定构建模式和环境变量
-docker build \
-  --build-arg VITE_BUILD_MODE=production \
-  --build-arg VITE_BASE_URL=/test/ \
-  --build-arg VITE_APPLICATION_CODE=g2rain-infra-app \
-  --build-arg VITE_BACKEND_ORIGIN=https://api.example.com \
-  --build-arg VITE_APPLICATION_CONTEXT=/test \
-  -t g2rain-infra-app .
-```
-
-**注意**：环境变量需要在构建时通过 `--build-arg` 传入，Vite 会在构建时将环境变量打包到代码中。运行容器的详细说明请参考 [构建与部署](#构建与部署) 部分。
-
----
-
-## 🐳 构建与部署
-
-### 1. 运行容器
-
-构建镜像后，使用以下命令运行容器：
-
-```bash
-docker run -d \
-  -p 8080:8080 \
-  -e BASE_URL=/test \
-  -e GATEWAY_HOST=gateway.example.com \
-  -e GATEWAY_PORT=8080 \
-  -e IAM_HOST=iam.example.com \
-  -e IAM_PORT=8080 \
-  -e SERVER_PORT=8080 \
-  -v ./lua/keys:/usr/local/openresty/nginx/lua/keys:ro \
-  g2rain-infra-app
-```
-
-**环境变量说明**：
-- `BASE_URL`: 应用基础路径（如 `/test`）
-- `GATEWAY_HOST`: API 网关主机地址
-- `GATEWAY_PORT`: API 网关端口
-- `IAM_HOST`: IAM 服务主机地址
-- `IAM_PORT`: IAM 服务端口
-- `SERVER_PORT`: Nginx 监听端口（默认 8080）
-
-**注意**：前端相关的环境变量（如 `VITE_BASE_URL`、`VITE_SSO_BASE_URL` 等）需要在构建时通过 `--build-arg` 传入，运行时无需再设置。
-
-### 2. Docker Compose
-
-创建 `docker-compose.yml` 文件：
-
-```yaml
-version: '3.8'
-services:
-  web:
-    build:
-      context: .
-      args:
-        # 前端环境变量（构建时传入）
-        - VITE_BUILD_MODE=production
-        - VITE_APPLICATION_CODE=g2rain-infra-app
-        - VITE_BASE_URL=/test/
-        - VITE_BACKEND_ORIGIN=https://api.example.com
-        - VITE_APPLICATION_CONTEXT=/test
-        - VITE_SSO_BASE_URL=https://sso.example.com
-        - VITE_REDIRECT_URI=https://your-domain.com/test/sso_callback
-    ports:
-      - "8080:8080"
-    environment:
-      # 运行时环境变量（Nginx 配置使用）
-      - BASE_URL=/test
-      - GATEWAY_HOST=gateway.example.com
-      - GATEWAY_PORT=8080
-      - IAM_HOST=iam.example.com
-      - IAM_PORT=8080
-      - SERVER_PORT=8080
-    volumes:
-      - ./lua/keys:/usr/local/openresty/nginx/lua/keys:ro
-```
-
-运行：
-
-```bash
-docker-compose up -d
-```
-
-### 3. 密钥文件配置（可选）
-
-如果使用 Lua 签名功能，需要配置密钥文件：
-
-1. **生成密钥对（DER 格式）**：
-
-```bash
-cd lua/keys
-
-# 生成私钥（PEM 格式）
-openssl ecparam -genkey -name prime256v1 -noout -out private-key.pem
-
-# 转换为 DER 格式
-openssl ec -in private-key.pem -outform DER -out private-key.der
-
-# 生成公钥（PEM 格式）
-openssl ec -in private-key.pem -pubout -out public-key.pem
-
-# 转换为 DER 格式
-openssl ec -in public-key.pem -pubout -outform DER -out public-key.der
-
-# 生成 keyId（可选，或手动创建）
-echo "yEMzeGLlhMpK5GxQKP5Fhg7JH9eALB7BK2BkadTOUxw" > iam-key-id.txt
-```
-
-2. **设置文件权限**：
-
-```bash
-chmod 600 lua/keys/private-key.der
-chmod 644 lua/keys/public-key.der
-chmod 644 lua/keys/iam-key-id.txt
-```
-
-3. **确保密钥文件不被提交到版本控制系统**（已在 `.gitignore` 中配置）
-
----
-
-## 🐛 常见问题
-
-### 1. 子应用加载失败
-
-检查：
-- 子应用是否已启动
-- 主应用中的 `entry` 配置是否正确
-- 子应用是否按照 qiankun 规范配置了生命周期函数
-- 检查浏览器控制台是否有错误信息
-
-### 2. Token 未正确接收
-
-检查：
-- 主应用是否正确传递了 `token` 和 `tokenKid` props
-- 子应用的 `mount` 生命周期是否正常执行
-- 检查浏览器控制台是否有 token 初始化相关的日志
-
-### 3. 路径配置错误
-
-检查：
-- `VITE_BASE_URL` 是否与主应用分配的路径一致
-- `VITE_REDIRECT_URI` 是否包含正确的基础路径
-- `VITE_APPLICATION_CONTEXT` 是否与 nginx 配置一致
-- 生产环境构建时是否正确传入了环境变量
-
-### 4. Token 持久化问题
-
-检查：
-- 子应用模式下，token 不应该持久化（这是正常行为）
-- 独立运行模式下，token 应该正常持久化到 localStorage
-- 检查 `window.__POWERED_BY_QIANKUN__` 是否正确检测
-
-### 5. SSO 回调失败
-
-检查：
-- `VITE_REDIRECT_URI` 配置是否正确
-- SSO 服务配置的回调地址是否与 `VITE_REDIRECT_URI` 一致
-- 路由配置是否正确（`/sso_callback` 路由是否存在）
-
-### 6. 路由 404 错误
-
-检查：
-- `VITE_BASE_URL` 配置是否正确
-- Nginx 配置中的 `try_files` 是否正确
-- 生产环境是否配置了正确的 `BASE_URL`
-
-### 7. DPoP 签名验证失败
-
-检查：
-- 客户端密钥对是否正确生成
-- 服务器端公钥配置是否正确
-- 时间同步是否正常
-
----
-
-## 📝 项目结构
-
-```
-g2rain-infra-app/
-├── src/
-│   ├── App.vue              # 根组件
-│   ├── main.ts              # 入口文件（包含 qiankun 生命周期）
-│   ├── qiankun.ts           # qiankun 配置和 token 初始化
-│   ├── router/              # 路由配置
-│   │   └── index.ts         # 路由定义和初始化
-│   ├── store/               # Pinia 状态管理
-│   │   ├── index.ts         # Store 初始化
-│   │   └── modules/
-│   │       └── token.ts     # Token store（子应用不持久化）
-│   ├── types/               # TypeScript 类型定义
-│   │   ├── env.d.ts         # 环境变量类型
-│   │   ├── http.ts          # HTTP 相关类型
-│   │   └── menu.ts          # 菜单相关类型
-│   ├── utils/               # 工具函数
-│   │   ├── env.ts           # 环境变量工具
-│   │   ├── http.ts          # HTTP 请求工具（包含 DPoP 签名）
-│   │   ├── sign.ts          # 签名工具
-│   │   └── sso.ts           # SSO 工具
-│   └── views/               # 页面组件
-│       ├── Home.vue          # 首页
-│       ├── SsoCallback.vue   # SSO 回调页面
-│       └── system/           # 系统管理模块示例
-│           ├── User.vue      # 用户管理
-│           └── Role.vue      # 角色管理
-├── lua/                     # OpenResty Lua 签名示例（可选）
-│   ├── config.lua           # 密钥配置
-│   ├── sign.lua             # 签名实现
-│   └── sign_api.lua         # 签名接口
-├── nginx/                   # Nginx 配置示例（可选）
-│   ├── default.conf.template # Nginx 配置模板
-│   └── docker-entrypoint.sh # 启动脚本
-├── Dockerfile               # Docker 构建文件
-├── vite.config.ts           # Vite 配置
-├── tsconfig.json            # TypeScript 配置
-└── package.json             # 项目依赖配置
-```
-
----
-
-## 📝 代码规范
-
-- 使用 TypeScript 进行类型检查
-- 遵循 Vue 3 Composition API 规范
-- 使用 ESLint 进行代码检查（如已配置）
-- 组件和工具函数按功能模块组织
-
-## 🤝 贡献指南
-
-我们欢迎所有形式的贡献！
-
-**Issue 与讨论**请统一到主仓库 [g2rain/g2rain](https://github.com/g2rain/g2rain/issues) 提交，便于集中跟踪；请在标题或正文中注明与 **g2rain-infra-app** 相关。
-
-### 贡献流程
-
-1. **Fork** 本仓库
-2. **创建特性分支**：`git checkout -b feature/your-feature-name`
-3. 本地修改后执行 `npm run build`，确保可正常编译
-4. **提交更改**：`git commit -m "Add some feature"`
-5. **推送分支**：`git push origin feature/your-feature-name`
-6. **提交 Pull Request**
-
-维护者信息与 `package.json` 中 `contributors` 字段一致（与 [g2rain-spring-boot-starter](https://github.com/g2rain/g2rain-spring-boot-starter) 开发者信息对齐）。
-
-安全相关问题请见 [SECURITY.md](SECURITY.md)。
-
-## 📄 许可证
-
-本项目基于 [Apache 2.0许可证](LICENSE) 开源。
-
-## 📞 联系我们
-
-- **Issues**: [GitHub Issues](https://github.com/g2rain/g2rain/issues)
-- **讨论**: [GitHub Discussions](https://github.com/g2rain/g2rain/discussions)
-- **邮箱**: g2rain_developer@163.com
-
-## 🙏 致谢
-
-感谢所有为这个项目做出贡献的开发者们！
-
----
-
-⭐ 如果这个项目对您有帮助，请给我们一个Star！
-
----
-
-**注意**：
-- 使用前请确保已正确配置环境变量，特别是路径相关的配置
-- 子应用模式下，token 由主应用管理，无需配置 SSO 相关环境变量
-- 独立运行模式下，需要完整配置 SSO 相关环境变量
+| 现象 | 建议检查 |
+| --- | --- |
+| 构建找不到已声明的依赖 | 使用 `npm ci --legacy-peer-deps` 按锁文件同步依赖，避免沿用陈旧 `node_modules`。 |
+| 直链跳转循环或 404 | 核对 `mode=alone`、Context Path、main-shell redirect prefix、entry 与 activeRule。 |
+| 页面为空或路由不存在 | 核对应用编码、Basis 资源响应及资源 `linkPath` 与 route-map。 |
+| 按钮权限缺失 | 核对静态权限编码、页面元素资源和生成 JSON；动态表达式不会被可靠扫描。 |
+| API 401/403 | 核对 Token/Client、IAM、Gateway 和服务端权限；不要用前端隐藏按钮代替鉴权。 |
+| 资源生成没有 API endpoint | 当前功能未接入主流程，这是已登记限制。 |
+
+更多场景见[故障排查文档](docs/operations/troubleshooting.md)。
+
+## 与关联仓库的关系
+
+本仓库由 `g2rain-main-shell` 统一装载，通过 `g2rain-iam` 建立认证，通过 `g2rain-basis` 获取页面与权限资源，再经 Gateway 调用 `g2rain-infra` 完成基础设施管理操作。
+
+| 仓库 | 协作关系 |
+| --- | --- |
+| `g2rain-main-shell` | 正式入口、Tab、初始路由、Token/Locale 上下文和 qiankun 生命周期 |
+| `g2rain-iam` | 独立模式 SSO、Token 与客户端认证 |
+| `g2rain-gateway-webflux` | `/api/` 业务请求的鉴权与转发 |
+| `g2rain-basis` | `/basis/authority/resources` 页面、页面元素与 API 资源 |
+| `g2rain-infra` | 发号器、字典、地区语言和国际化消息的后端领域能力 |
+
+## 模块说明
+
+| 模块 | 职责说明 | 代码线索 |
+| --- | --- | --- |
+| 复用组件 | 查询表单、排序、远程选择、权限、HTTP、加载和微应用消息。 | `src/components` |
+| 平台协议 | Token、Locale、i18n、Store、错误模型与 qiankun 适配。 | `src/platform` |
+| 应用运行时 | SSO、HTTP、资源加载、路由、启动和多实例状态。 | `src/runtime` |
+| 构建期与基础工具 | 环境/URL/模式工具，以及页面和资源配置生成器。 | `src/shared` |
+| 基础设施管理页面 | 发号器、字典用途/字典项、地区语言和国际化消息页面与 API。 | `src/views` |
+
+## 职责边界
+
+该仓库主要负责：
+
+- 基础设施管理页面、页面本地 API/类型与交互用例。
+- 本应用资源加载、路由注册、权限呈现、国际化和双运行模式。
+- qiankun 子应用生命周期以及向主应用报告本应用路由变化。
+- 本项目页面代码与资源配置生成工具。
+
+该仓库默认不负责：
+
+- 不负责 main-shell 的全局布局、菜单、Tab 或其他子应用编排。
+- 不拥有 `g2rain-infra` 的数据、编号算法和服务端业务规则。
+- 不替代 IAM、Gateway、Basis 或 Infra 的认证、授权、租户和数据校验。
+- 不把生成代码或前端权限配置视为后端契约与安全事实。
+
+## 参与贡献
+
+我们欢迎所有形式的贡献：Issue 反馈、文档改进、功能建议与代码提交。
+
+推荐流程：
+
+1. Fork 本仓库。
+2. 创建特性分支：`git checkout -b feature/your-feature-name`。
+3. 提交更改：`git commit -m "Add some feature"`。
+4. 推送分支：`git push origin feature/your-feature-name`。
+5. 提交 Pull Request。
+
+代码贡献前请尽量补充必要的测试和文档，并确保构建、测试与静态检查通过。
+
+## 许可证
+
+本项目基于 [Apache License 2.0](LICENSE) 开源。
+
+## 联系我们
+
+- Issues: [GitHub Issues](https://github.com/g2rain/g2rain/issues)
+- 讨论: [GitHub Discussions](https://github.com/g2rain/g2rain/discussions)
+- 邮箱: g2rain_developer@163.com
+
+## 致谢
+
+感谢所有为 g2rain 项目提交 Issue、代码、文档、建议和使用反馈的开发者们！

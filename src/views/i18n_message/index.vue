@@ -220,7 +220,7 @@ import { LocaleSettingApi, type LanguageCountriesMap } from '../locale_setting/a
 import type { I18nMessage, I18nMessagePayload, I18nMessageQuery } from './type';
 import type { BaseSelectListDto, PageSelectListDto } from '@platform/types/api.type';
 
-import { SortableTable, TableColumn, SortManagerButton, QueryForm, showErrorMessage } from '@/components';
+import { SortableTable, TableColumn, SortManagerButton, QueryForm } from '@/components';
 import { storeToRefs } from 'pinia';
 import { useLocaleStore } from '@platform/stores/locale.store';
 
@@ -322,8 +322,8 @@ const loadDicts = async () => {
 
   try {
     languageCountryMap.value = await LocaleSettingApi.getLanguageCountries();
-  } catch (error: unknown) {
-    showErrorMessage(error instanceof Error ? error : t('INFRA_I18N_MESSAGE_MSG_LANG_COUNTRY_FAIL', '加载语言国家数据失败'));
+  } catch {
+    // 请求失败已由 http 层统一提示
   }
 };
 
@@ -374,8 +374,8 @@ const loadData = async () => {
     // 设置响应结果 
     tableData.value = pageData.records;
     pagination.total = pageData.total;
-  } catch (error: unknown) {
-    showErrorMessage(error instanceof Error ? error : t('G2_MSG_LOAD_FAIL', '加载列表失败'));
+  } catch {
+    // 请求失败已由 http 层统一提示
   }
 };
 
@@ -397,7 +397,6 @@ const handleReset = () => {
   baseQueryForm.id = undefined;
   baseQueryForm.createTime = undefined;
   baseQueryForm.updateTime = undefined;
-  baseQueryForm.sorts = undefined;
   
   // 重置业务特定查询表单
   queryForm.messageUsageCode = '';
@@ -442,17 +441,13 @@ const handleDelete = (row: I18nMessage) => {
     { type: 'warning' },
   )
     .then(async () => {
-      try {
-        await I18nMessageApi.remove(row.id);
-        // 如果当前页只有一条数据，删除后应该跳转到上一页
-        if (tableData.value.length === 1 && pagination.pageNum > 1) {
-          pagination.pageNum--;
-        }
-        await loadData();
-        ElMessage.success(t('G2_MSG_DELETE_OK', '删除成功'));
-      } catch (error: unknown) {
-        showErrorMessage(error instanceof Error ? error : t('G2_MSG_DELETE_FAIL', '删除失败'));
+      await I18nMessageApi.remove(row.id);
+      // 如果当前页只有一条数据，删除后应该跳转到上一页
+      if (tableData.value.length === 1 && pagination.pageNum > 1) {
+        pagination.pageNum--;
       }
+      await loadData();
+      ElMessage.success(t('G2_MSG_DELETE_OK', '删除成功'));
     })
     .catch(() => {});
 };
@@ -543,22 +538,18 @@ const submitEdit = async () => {
     tag: editForm.messageUsageCode === MESSAGE_USAGE_UI_MESSAGE ? editForm.tag : undefined,
   };
 
-  try {
-    // 编辑模式下，将 id 添加到 payload 中
-    if (isEdit.value) {
-      payload.id = editForm.id;
-    }
-    await I18nMessageApi.save(payload);
-
-    if (!isEdit.value && editForm.messageUsageCode === MESSAGE_USAGE_UI_MESSAGE) {
-      await loadDicts();
-    }
-    ElMessage.success(isEdit.value ? t('G2_MSG_UPDATE_OK', '更新成功') : t('G2_MSG_ADD_OK', '新增成功'));
-    await loadData();
-    editDialogVisible.value = false;
-  } catch (error: unknown) {
-    showErrorMessage(error instanceof Error ? error : t('G2_MSG_SAVE_FAIL', '保存失败'));
+  // 编辑模式下，将 id 添加到 payload 中
+  if (isEdit.value) {
+    payload.id = editForm.id;
   }
+  await I18nMessageApi.save(payload);
+
+  if (!isEdit.value && editForm.messageUsageCode === MESSAGE_USAGE_UI_MESSAGE) {
+    await loadDicts();
+  }
+  ElMessage.success(isEdit.value ? t('G2_MSG_UPDATE_OK', '更新成功') : t('G2_MSG_ADD_OK', '新增成功'));
+  await loadData();
+  editDialogVisible.value = false;
 };
 
 const { locale: userLocale } = storeToRefs(useLocaleStore());

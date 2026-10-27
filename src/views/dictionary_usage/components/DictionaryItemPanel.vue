@@ -140,7 +140,7 @@ import { DictionaryItemApi } from '@/views/dictionary_usage/dictionary_item/api'
 import type { DictionaryItem, DictionaryItemPayload, DictionaryItemQuery, DictionaryItemTree} from '@/views/dictionary_usage/dictionary_item/type';
 import type { PageSelectListDto } from '@platform/types/api.type';
 import type { QueryFormData } from '@/components/QueryForm';
-import { SortableTable, TableColumn, SortManagerButton, QueryForm, showErrorMessage } from '@/components';
+import { SortableTable, TableColumn, SortManagerButton, QueryForm } from '@/components';
 
 const props = defineProps<{
   dictionaryUsageCode: string;
@@ -195,9 +195,8 @@ const loadData = async () => {
     // 设置响应结果 
     tableData.value = pageData.records;
     pagination.total = pageData.total;
-  } catch (error: unknown) {
-    const msg = error instanceof Error ? error.message : t('G2_MSG_LOAD_FAIL', '加载列表失败');
-    showErrorMessage(msg);
+  } catch {
+    // 请求失败已由 http 层统一提示
   }
 };
 
@@ -252,17 +251,12 @@ const handleDelete = (row: DictionaryItem) => {
     { type: 'warning' },
   )
     .then(async () => {
-      try {
-        await DictionaryItemApi.remove(row.id);
-        if (tableData.value.length === 1 && pagination.pageNum > 1) {
-          pagination.pageNum--;
-        }
-        await loadData();
-        ElMessage.success(t('G2_MSG_DELETE_OK', '删除成功'));
-      } catch (error: unknown) {
-        const msg = error instanceof Error ? error.message : t('G2_MSG_DELETE_FAIL', '删除失败');
-        showErrorMessage(msg);
+      await DictionaryItemApi.remove(row.id);
+      if (tableData.value.length === 1 && pagination.pageNum > 1) {
+        pagination.pageNum--;
       }
+      await loadData();
+      ElMessage.success(t('G2_MSG_DELETE_OK', '删除成功'));
     })
     .catch(() => {});
 };
@@ -338,18 +332,13 @@ const submitEdit = async () => {
     description: editForm.description,
   };
 
-  try {
-    if (isEdit.value) {
-      payload.id = editForm.id;
-    }
-    await DictionaryItemApi.save(payload);
-    ElMessage.success(isEdit.value ? t('G2_MSG_UPDATE_OK', '更新成功') : t('G2_MSG_ADD_OK', '新增成功'));
-    await loadData();
-    editDialogVisible.value = false;
-  } catch (error: unknown) {
-    const msg = error instanceof Error ? error.message : t('G2_MSG_SAVE_FAIL', '保存失败');
-    showErrorMessage(msg);
+  if (isEdit.value) {
+    payload.id = editForm.id;
   }
+  await DictionaryItemApi.save(payload);
+  ElMessage.success(isEdit.value ? t('G2_MSG_UPDATE_OK', '更新成功') : t('G2_MSG_ADD_OK', '新增成功'));
+  await loadData();
+  editDialogVisible.value = false;
 };
 
 const parentTreeData = ref<DictionaryItemTree[]>([]);
@@ -406,9 +395,7 @@ async function refreshParentTree() {
       merged = filterTreeExcludingSelf(merged, editForm.id);
     }
     parentTreeData.value = merged;
-  } catch (error: unknown) {
-    const msg = error instanceof Error ? error.message : t('INFRA_DICTIONARY_ITEM_MSG_TREE_FAIL', '加载父级树失败');
-    showErrorMessage(msg);
+  } catch {
     parentTreeData.value = [createTopLevelTreeOption(props.dictionaryUsageCode)];
   } finally {
     parentTreeLoading.value = false;
@@ -419,7 +406,6 @@ function resetQueryFields() {
   baseQueryForm.id = undefined;
   baseQueryForm.createTime = undefined;
   baseQueryForm.updateTime = undefined;
-  baseQueryForm.sorts = undefined;
   queryForm.parentId = undefined as number | undefined;
   queryForm.code = '';
   queryForm.name = '';

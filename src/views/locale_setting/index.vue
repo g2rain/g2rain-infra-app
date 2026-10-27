@@ -135,7 +135,7 @@ import { LocaleSettingApi } from './api';
 import type { LocaleSetting, LocaleSettingPayload, LocaleSettingQuery } from './type';
 import type { BaseSelectListDto, PageSelectListDto } from '@platform/types/api.type';
 
-import { SortableTable, TableColumn, SortManagerButton, QueryForm, showErrorMessage } from '@/components';
+import { SortableTable, TableColumn, SortManagerButton, QueryForm } from '@/components';
 
 // 定义字典引用
 const localeOptions = ref<Array<{ label: string; value: string }>>([]);
@@ -194,8 +194,8 @@ const loadData = async () => {
     // 设置响应结果    
     tableData.value = pageData.records;
     pagination.total = pageData.total;
-  } catch (error: unknown) {
-    showErrorMessage(error instanceof Error ? error : t('G2_MSG_LOAD_FAIL', '加载列表失败'));
+  } catch {
+    // 请求失败已由 http 层统一提示
   }
 };
 
@@ -217,7 +217,6 @@ const handleReset = () => {
   baseQueryForm.id = undefined;
   baseQueryForm.createTime = undefined;
   baseQueryForm.updateTime = undefined;
-  baseQueryForm.sorts = undefined;
   
   // 重置业务特定查询表单
   queryForm.code = '';
@@ -258,17 +257,13 @@ const handleDelete = (row: LocaleSetting) => {
     { type: 'warning' },
   )
     .then(async () => {
-      try {
-        await LocaleSettingApi.remove(row.id);
-        // 如果当前页只有一条数据，删除后应该跳转到上一页
-        if (tableData.value.length === 1 && pagination.pageNum > 1) {
-          pagination.pageNum--;
-        }
-        await loadData();
-        ElMessage.success(t('G2_MSG_DELETE_OK', '删除成功'));
-      } catch (error: unknown) {
-        showErrorMessage(error instanceof Error ? error : t('G2_MSG_DELETE_FAIL', '删除失败'));
+      await LocaleSettingApi.remove(row.id);
+      // 如果当前页只有一条数据，删除后应该跳转到上一页
+      if (tableData.value.length === 1 && pagination.pageNum > 1) {
+        pagination.pageNum--;
       }
+      await loadData();
+      ElMessage.success(t('G2_MSG_DELETE_OK', '删除成功'));
     })
     .catch(() => {});
 };
@@ -340,18 +335,14 @@ const submitEdit = async () => {
     description: editForm.description,
   };
 
-  try {
-    // 编辑模式下，将 id 添加到 payload 中
-    if (isEdit.value) {
-      payload.id = editForm.id;
-    }
-    await LocaleSettingApi.save(payload);
-    ElMessage.success(isEdit.value ? t('G2_MSG_UPDATE_OK', '更新成功') : t('G2_MSG_ADD_OK', '新增成功'));
-    await loadData();
-    editDialogVisible.value = false;
-  } catch (error: unknown) {
-    showErrorMessage(error instanceof Error ? error : t('G2_MSG_SAVE_FAIL', '保存失败'));
+  // 编辑模式下，将 id 添加到 payload 中
+  if (isEdit.value) {
+    payload.id = editForm.id;
   }
+  await LocaleSettingApi.save(payload);
+  ElMessage.success(isEdit.value ? t('G2_MSG_UPDATE_OK', '更新成功') : t('G2_MSG_ADD_OK', '新增成功'));
+  await loadData();
+  editDialogVisible.value = false;
 };
 
 // 挂载回调

@@ -32,17 +32,14 @@
 
 ## 实现约束
 
-- 保持目标依赖方向：`views → runtime → platform → components → shared`；`main.ts`/`App.vue` 是组合根。
-- 不扩大 components 对 platform/runtime/views、platform 对 runtime/views、runtime 对 views 的已知反向依赖。
-- 业务页面、页面 API、类型和局部组件保留在 `src/views`；新增页面同步 `src/views/route-map.ts`。
-- 独立模式与 qiankun 集成模式都要考虑；集成模式保持 `appKey` 多实例隔离和 mount/update/unmount 配对清理。
-- 前端页面与按钮权限只控制界面呈现，不能替代 Gateway 和后端服务鉴权。
-- Token、私钥、生产域名、真实个人数据和敏感配置不得写入源码、Mock、生成结果、文档或提交记录。
-- 修改路由或静态权限点后评估并运行 `npm run build:config`；当前工具不生成 API endpoint。
-- 运行代码生成器前检查 Git 状态；生成器会覆盖同名页面文件，生成后必须 Review Diff。
-- 修改 API、页面、配置、命令、生成流程、运行时或部署时同步更新 docs 和 README。
-- 有意偏离中央 Profile 时更新 `docs/architecture/deviations.md`。
-- 不添加只供 Agent 使用的项目脚本；真正的自动检查应服务开发者和 CI。
+- 目标依赖方向是 `views -> runtime -> platform -> components -> shared`；组合入口为 `src/main.ts` 与 `src/App.vue`。
+- 新代码不得扩大 `components -> platform/runtime`、`platform -> runtime`、`shared -> components/runtime` 等已登记偏差。
+- 基础设施页面、页面 API、类型与 Mock 放在 `src/views/<domain>`，并同步 `src/views/route-map.ts`。
+- 同时评估 qiankun 集成模式和独立模式；集成挂载要求显式 applicationCode/viewId/instanceId，认证经 Auth Bridge。
+- 前端权限不能替代服务端授权；当前 `hasApiPermission` 直接返回 `true`，不可声称已实施 API 授权。
+- 不提交 Token、私钥、真实凭据或生产敏感地址；生产环境禁用 Mock。
+- `build:generate` 会覆盖文件。执行前确认工作区安全，执行后审查 view、API、type、mock 和 route-map。
+- `build:config` 会覆盖已跟踪的资源 JSON；当前 API parser 未接入主流程，`apiEndpoints` 为空。
 
 ## 完成前
 

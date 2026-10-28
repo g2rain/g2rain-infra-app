@@ -139,8 +139,7 @@ import { t } from '@platform/i18n';
 import { DictionaryItemApi } from '@/views/dictionary_usage/dictionary_item/api';
 import type { DictionaryItem, DictionaryItemPayload, DictionaryItemQuery, DictionaryItemTree} from '@/views/dictionary_usage/dictionary_item/type';
 import type { PageSelectListDto } from '@platform/types/api.type';
-import type { QueryFormData } from '@/components/QueryForm';
-import { SortableTable, TableColumn, SortManagerButton, QueryForm } from '@/components';
+import { SortableTable, TableColumn, SortManagerButton, QueryForm, type QueryFormData } from '@g2rain/ui';
 
 const props = defineProps<{
   dictionaryUsageCode: string;
@@ -154,7 +153,7 @@ const panelTitle = computed(() =>
 const queryFormRef = ref<InstanceType<typeof QueryForm> | null>(null);
 
 // 基础查询表单（与 QueryForm 的 QueryFormData 对齐）
-let baseQueryForm = reactive<QueryFormData>({
+const baseQueryForm = ref<QueryFormData>({
   id: undefined,
   createTime: undefined,
   updateTime: undefined,
@@ -181,7 +180,7 @@ const loadData = async () => {
   try {
     // 合并基础查询 + 业务查询，并过滤空值
     const query = Object.fromEntries(
-      Object.entries({ ...baseQueryForm, ...queryForm, usageCode: props.dictionaryUsageCode})
+      Object.entries({ ...baseQueryForm.value, ...queryForm, usageCode: props.dictionaryUsageCode})
         .filter(([_, v]) => (v ?? '') !== '' && [v].flat().length)
     ) as DictionaryItemQuery;
 
@@ -403,9 +402,9 @@ async function refreshParentTree() {
 }
 
 function resetQueryFields() {
-  baseQueryForm.id = undefined;
-  baseQueryForm.createTime = undefined;
-  baseQueryForm.updateTime = undefined;
+  baseQueryForm.value.id = undefined;
+  baseQueryForm.value.createTime = undefined;
+  baseQueryForm.value.updateTime = undefined;
   queryForm.parentId = undefined as number | undefined;
   queryForm.code = '';
   queryForm.name = '';
@@ -439,7 +438,7 @@ watch(editDialogVisible, (open) => {
 
 .dictionary-item-panel__search {
   margin-bottom: 12px;
-  background-color: #fff;
+  background-color: var(--g2-bg-container);
 }
 
 .dictionary-item-panel__header {
@@ -448,7 +447,7 @@ watch(editDialogVisible, (open) => {
   justify-content: space-between;
   margin-bottom: 12px;
   padding: 12px 16px;
-  background-color: #fff;
+  background-color: var(--g2-bg-container);
   border-radius: 4px;
 }
 

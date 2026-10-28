@@ -10,15 +10,19 @@ architectureBaseline:
   ref: architecture-v1.1.0
   profile: docs/architecture/profiles/frontend-app
   version: 1.0.0
-  status: planned
+  status: pilot
   releasedAt: "2026-08-25"
   deviations: docs/architecture/deviations.md
+
+projectArchitecture:
+  role: frontend-app
+  note: HTTP 公共内核经 @g2rain/http，生命周期经 @g2rain/platform/sub；集成挂载要求显式 applicationCode/viewId/instanceId（appKey===instanceId），认证经 Auth Bridge，不再接受仅 appKey 或 props Token 的旧壳路径。
 
 ownership:
   owns:
     - 发号器、字典用途、字典项、地区语言和国际化消息的管理端页面与交互用例
     - 本应用的路由注册、资源加载、权限呈现、国际化和微前端生命周期
-    - 本项目页面代码生成器和资源配置生成器
+    - 本项目生成输入（scripts/database.sql）与资源配置产物
   excludes:
     - g2rain-infra 的领域数据、持久化、编号算法和服务端校验
     - IAM 的认证、Token 签发和会话规则
@@ -56,7 +60,7 @@ runtime:
       auth: 应用自行执行 IAM SSO、Token 管理和资源加载
     integrated:
       selector: 默认空模式
-      auth: main-shell 通过 qiankun props 注入 Token、Client、Locale、初始路由和 appKey
+      auth: main-shell 经 Auth Bridge 定向消息下发 Token；公开 props 下发身份字段与 Locale
   resourceEndpoint: /basis/authority/resources
   backendRoutePrefix: /infra
   devServer:
@@ -76,16 +80,20 @@ commands:
   image: docker build --build-arg VITE_BUILD_MODE=production -t g2rain/g2rain-infra-app:<tag> .
 
 generators:
+  engine: create-g2rain-app
   code:
-    input: src/shared/generator/database.sql
+    command: g2rain-app generate
+    input: scripts/database.sql
     output: src/views/<table>
     updatesRouteMap: true
     overwritesExistingFiles: true
-    switches: [--no-view, --no-api, --no-mock, --no-route]
+    switches: [--skip-view, --skip-api, --skip-mock, --skip-route]
   resource:
+    command: g2rain-app build-config
     routeInput: src/views/route-map.ts
     viewInput: src/views
     output: src/shared/config-util/config
+    outputTracked: true
     generated: [resources.json, pages.json, page-elements.json]
     apiEndpointGeneration: false
 
@@ -102,14 +110,15 @@ collaborators:
     role: 发号器、字典、地区语言和国际化消息后端能力
 
 validation:
-  reviewedAt: "2026-09-05"
+  reviewedAt: "2026-10-28"
   command: npm run build
   status: build-passed
   testsRun: 0
   notes:
-    - 依赖按 package-lock.json 同步后，Vue TypeScript 检查和 Vite 生产构建通过
-    - 仓库未配置 test 或 lint 脚本，也未发现自动化测试文件
-    - 构建仍存在循环分块、MockJS eval、经典 env-config.js 和大包体积警告
+    - 已接入 @g2rain/{http,platform,theme,ui}、createStandardSubPlatform、Auth Bridge
+    - 壳侧已将 g2rain-infra-app 从 legacy registry 迁出（main-shell）
+    - 代码/资源配置生成已迁 create-g2rain-app（scripts/ + file:../g2rain-app-cli）
+    - 浏览器联调（alone + main-shell 挂载）待验收
 
 documentation:
   entry: docs/index.md

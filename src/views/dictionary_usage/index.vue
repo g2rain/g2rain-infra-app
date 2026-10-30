@@ -103,8 +103,17 @@
       </template>
     </el-dialog>
 
-    <el-drawer v-model="itemDrawerVisible" :title="itemDrawerTitle" direction="rtl" size="90%" destroy-on-close class="dictionary_usage-item-drawer">
-      <DictionaryItemPanel v-if="itemDrawerUsageCode != ''" :dictionary-usage-code="itemDrawerUsageCode" />
+    <el-drawer v-model="itemDrawerVisible" direction="rtl" size="90%" destroy-on-close class="dictionary_usage-item-drawer">
+      <template #header>
+        <span class="dictionary_usage-item-drawer__title">
+          {{ $t('INFRA_DICTIONARY_USAGE_LBL_ITEMS', '字典项') }} — {{ itemDrawerLabel }}
+        </span>
+      </template>
+      <DictionaryItemPanel
+        v-if="itemDrawerUsageCode !== ''"
+        :key="itemDrawerUsageCode"
+        :dictionary-usage-code="itemDrawerUsageCode"
+      />
     </el-drawer>
   </div>
 </template>
@@ -316,14 +325,11 @@ const itemDrawerVisible = ref(false);
 const itemDrawerUsageCode = ref('');
 const itemDrawerLabel = ref('');
 
-const itemDrawerTitle = computed(() => {
-  const itemsLabel = t('INFRA_DICTIONARY_USAGE_LBL_ITEMS', '字典项');
-  return itemDrawerLabel.value ? `${itemsLabel} — ${itemDrawerLabel.value}` : itemsLabel;
-});
-
 const openDictionaryItems = (row: DictionaryUsage) => {
-  itemDrawerUsageCode.value = row.usageCode;
-  itemDrawerLabel.value = row.usageName || row.usageCode || String(row.id);
+  const usageCode = row.usageCode?.trim() ?? '';
+  const usageName = row.usageName?.trim() ?? '';
+  itemDrawerUsageCode.value = usageCode;
+  itemDrawerLabel.value = usageName || usageCode || String(row.id ?? '');
   itemDrawerVisible.value = true;
 };
 
@@ -382,5 +388,11 @@ onMounted(() => {
   display: flex;
   justify-content: flex-end;
   margin-top: 16px;
+}
+
+.dictionary_usage-item-drawer__title {
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.4;
 }
 </style>

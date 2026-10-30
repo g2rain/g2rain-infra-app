@@ -22,7 +22,9 @@
 
     <div class="dictionary-item-panel__header">
       <div class="dictionary-item-panel__title-group">
-        <h3>{{ panelTitle }}</h3>
+        <h3>
+          {{ $t('INFRA_DICTIONARY_USAGE_LBL_ITEMS', '字典项') }}（{{ $t('INFRA_DICTIONARY_USAGE_TITLE', '字典用途') }}：{{ dictionaryUsageCode }}）
+        </h3>
       </div>
       <el-button type="primary" v-permission="'dictionary_item:add'" @click="handleCreate">{{ $t('INFRA_DICTIONARY_ITEM_BTN_ADD', '新增字典项') }}</el-button>
     </div>
@@ -144,11 +146,6 @@ import { SortableTable, TableColumn, SortManagerButton, QueryForm, type QueryFor
 const props = defineProps<{
   dictionaryUsageCode: string;
 }>();
-
-const panelTitle = computed(
-  () =>
-    `${t('INFRA_DICTIONARY_USAGE_LBL_ITEMS', '字典项')}（${t('INFRA_DICTIONARY_USAGE_TITLE', '字典用途')}：${props.dictionaryUsageCode}）`,
-);
 
 // 组件引用
 const queryFormRef = ref<InstanceType<typeof QueryForm> | null>(null);

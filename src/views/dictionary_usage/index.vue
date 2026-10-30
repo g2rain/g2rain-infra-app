@@ -316,11 +316,10 @@ const itemDrawerVisible = ref(false);
 const itemDrawerUsageCode = ref('');
 const itemDrawerLabel = ref('');
 
-const itemDrawerTitle = computed(() =>
-  itemDrawerLabel.value
-    ? t('INFRA_DICTIONARY_USAGE_DRAWER_ITEMS', { name: itemDrawerLabel.value }, '字典项 — {name}')
-    : t('INFRA_DICTIONARY_USAGE_LBL_ITEMS', '字典项'),
-);
+const itemDrawerTitle = computed(() => {
+  const itemsLabel = t('INFRA_DICTIONARY_USAGE_LBL_ITEMS', '字典项');
+  return itemDrawerLabel.value ? `${itemsLabel} — ${itemDrawerLabel.value}` : itemsLabel;
+});
 
 const openDictionaryItems = (row: DictionaryUsage) => {
   itemDrawerUsageCode.value = row.usageCode;

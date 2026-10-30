@@ -145,8 +145,9 @@ const props = defineProps<{
   dictionaryUsageCode: string;
 }>();
 
-const panelTitle = computed(() =>
-  t('INFRA_DICTIONARY_ITEM_TITLE', { usageCode: props.dictionaryUsageCode }, '字典项（字典用途：{usageCode}）'),
+const panelTitle = computed(
+  () =>
+    `${t('INFRA_DICTIONARY_USAGE_LBL_ITEMS', '字典项')}（${t('INFRA_DICTIONARY_USAGE_TITLE', '字典用途')}：${props.dictionaryUsageCode}）`,
 );
 
 // 组件引用

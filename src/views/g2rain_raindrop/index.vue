@@ -29,7 +29,7 @@
     <!-- 标题和操作按钮 -->
     <div class="g2rain_raindrop-page__header">
       <div class="g2rain_raindrop-page__title-group">
-        <h2>{{ $t('INFRA_G2RAIN_RAINDROP_TITLE', '管理发号器数据') }}</h2>
+        <h2>{{ $t('INFRA_G2RAIN_RAINDROP_TITLE', '发号器') }}</h2>
       </div>
       <el-button type="primary" v-permission="'g2rain_raindrop:add'" @click="handleCreate">{{ $t('INFRA_G2RAIN_RAINDROP_BTN_ADD', '新增发号器') }}</el-button>
     </div>
@@ -265,7 +265,7 @@ const handleView = (row: G2rainRaindrop) => {
 // 删除数据记录
 const handleDelete = (row: G2rainRaindrop) => {
   ElMessageBox.confirm(
-    t('INFRA_G2RAIN_RAINDROP_DEL_CONFIRM', `确认删除发号器「${row.id}」吗？`),
+    t('INFRA_G2RAIN_RAINDROP_DEL_CONFIRM', { id: row.id }, '确认删除发号器「{id}」吗？'),
     t('G2_LBL_TIP', '提示'),
     { type: 'warning' },
   )

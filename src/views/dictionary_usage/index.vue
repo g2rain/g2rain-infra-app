@@ -24,7 +24,7 @@
     <!-- 标题和操作按钮 -->
     <div class="dictionary_usage-page__header">
       <div class="dictionary_usage-page__title-group">
-        <h2>{{ $t('INFRA_DICTIONARY_USAGE_TITLE', '管理字典用途数据') }}</h2>
+        <h2>{{ $t('INFRA_DICTIONARY_USAGE_TITLE', '字典用途') }}</h2>
       </div>
       <el-button type="primary" v-permission="'dictionary_usage:add'" @click="handleCreate">{{ $t('INFRA_DICTIONARY_USAGE_BTN_ADD', '新增字典用途') }}</el-button>
     </div>
@@ -224,7 +224,7 @@ const handleView = (row: DictionaryUsage) => {
 // 删除数据记录
 const handleDelete = (row: DictionaryUsage) => {
   ElMessageBox.confirm(
-    t('INFRA_DICTIONARY_USAGE_DEL_CONFIRM', `确认删除字典用途「${row.id}」吗？`),
+    t('INFRA_DICTIONARY_USAGE_DEL_CONFIRM', { id: row.id }, '确认删除字典用途「{id}」吗？'),
     t('G2_LBL_TIP', '提示'),
     { type: 'warning' },
   )
@@ -318,7 +318,7 @@ const itemDrawerLabel = ref('');
 
 const itemDrawerTitle = computed(() =>
   itemDrawerLabel.value
-    ? t('INFRA_DICTIONARY_USAGE_DRAWER_ITEMS', `字典项 — ${itemDrawerLabel.value}`)
+    ? t('INFRA_DICTIONARY_USAGE_DRAWER_ITEMS', { name: itemDrawerLabel.value }, '字典项 — {name}')
     : t('INFRA_DICTIONARY_USAGE_LBL_ITEMS', '字典项'),
 );
 

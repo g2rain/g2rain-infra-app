@@ -62,7 +62,7 @@
     <!-- 标题和操作按钮 -->
     <div class="i18n_message-page__header">
       <div class="i18n_message-page__title-group">
-        <h2>{{ $t('INFRA_I18N_MESSAGE_TITLE', '管理国际化信息数据') }}</h2>
+        <h2>{{ $t('INFRA_I18N_MESSAGE_TITLE', '国际化信息') }}</h2>
       </div>
       <el-button type="primary" v-permission="'i18n_message:add'" @click="handleCreate">
         {{ $t('INFRA_I18N_MESSAGE_BTN_ADD', '新增国际化信息') }}
@@ -436,7 +436,7 @@ const handleView = (row: I18nMessage) => {
 // 删除数据记录
 const handleDelete = (row: I18nMessage) => {
   ElMessageBox.confirm(
-    t('INFRA_I18N_MESSAGE_DEL_CONFIRM', `确认删除国际化信息「${row.id}」吗？`),
+    t('INFRA_I18N_MESSAGE_DEL_CONFIRM', { id: row.id }, '确认删除国际化信息「{id}」吗？'),
     t('G2_LBL_TIP', '提示'),
     { type: 'warning' },
   )

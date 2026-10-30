@@ -146,7 +146,7 @@ const props = defineProps<{
 }>();
 
 const panelTitle = computed(() =>
-  t('INFRA_DICTIONARY_ITEM_TITLE', `字典项（字典用途：${props.dictionaryUsageCode}）`),
+  t('INFRA_DICTIONARY_ITEM_TITLE', { usageCode: props.dictionaryUsageCode }, '字典项（字典用途：{usageCode}）'),
 );
 
 // 组件引用
@@ -245,7 +245,7 @@ const handleView = (row: DictionaryItem) => {
 // 删除数据记录
 const handleDelete = (row: DictionaryItem) => {
   ElMessageBox.confirm(
-    t('INFRA_DICTIONARY_ITEM_DEL_CONFIRM', `确认删除字典项「${row.id}」吗？`),
+    t('INFRA_DICTIONARY_ITEM_DEL_CONFIRM', { id: row.id }, '确认删除字典项「{id}」吗？'),
     t('G2_LBL_TIP', '提示'),
     { type: 'warning' },
   )

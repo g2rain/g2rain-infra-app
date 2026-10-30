@@ -26,7 +26,7 @@
     <!-- 标题和操作按钮 -->
     <div class="locale_setting-page__header">
       <div class="locale_setting-page__title-group">
-        <h2>{{ $t('INFRA_LOCALE_SETTING_TITLE', '管理地区语言数据') }}</h2>
+        <h2>{{ $t('INFRA_LOCALE_SETTING_TITLE', '地区语言') }}</h2>
       </div>
       <el-button type="primary" v-permission="'locale_setting:add'" @click="handleCreate">
         {{ $t('INFRA_LOCALE_SETTING_BTN_ADD', '新增地区语言') }}
@@ -252,7 +252,7 @@ const handleView = (row: LocaleSetting) => {
 // 删除数据记录
 const handleDelete = (row: LocaleSetting) => {
   ElMessageBox.confirm(
-    t('INFRA_LOCALE_SETTING_DEL_CONFIRM', `确认删除地区语言「${row.id}」吗？`),
+    t('INFRA_LOCALE_SETTING_DEL_CONFIRM', { id: row.id }, '确认删除地区语言「{id}」吗？'),
     t('G2_LBL_TIP', '提示'),
     { type: 'warning' },
   )

@@ -37,8 +37,8 @@
     <SortableTable :data="tableData" border stripe style="width: 100%" :enable-multi-sort="true" @sort-change="handleSortChange">
       <el-table-column prop="id" :label="$t('INFRA_G2RAIN_RAINDROP_COL_ID', '发号器标识')" width="130" />
       <el-table-column prop="bizTag" :label="$t('INFRA_G2RAIN_RAINDROP_FIELD_BIZ_TAG', '业务标签')" width="200" />
-      <el-table-column prop="maxId" :label="$t('INFRA_G2RAIN_RAINDROP_FIELD_MAX_ID', '最大 ID')" width="150" />
-      <el-table-column prop="step" :label="$t('INFRA_G2RAIN_RAINDROP_FIELD_STEP', '步长')" width="150" />
+      <el-table-column prop="maxId" :label="$t('INFRA_G2RAIN_RAINDROP_FIELD_MAX_ID', '最大 ID')" width="180" />
+      <el-table-column prop="step" :label="$t('INFRA_G2RAIN_RAINDROP_FIELD_STEP', '步长')" width="180" />
       <TableColumn prop="createTime" :label="$t('G2_FIELD_CREATE_TIME', '创建时间')" width="180" :sortable="true" />
       <TableColumn prop="updateTime" :label="$t('G2_FIELD_UPDATE_TIME', '更新时间')" width="180" :sortable="true" />
       <el-table-column :label="$t('G2_FIELD_ACTION', '操作')" fixed="right" width="280">
@@ -71,7 +71,7 @@
 
     <!-- 新增 / 编辑弹窗 -->
     <el-dialog v-model="editDialogVisible" :title="editDialogTitle" width="520px">
-      <el-form ref="editFormRef" :model="editForm" :rules="editRules" label-width="120px">
+      <el-form ref="editFormRef" :model="editForm" :rules="editRules" label-width="180px">
         <el-form-item :label="$t('INFRA_G2RAIN_RAINDROP_FIELD_BIZ_TAG', '业务标签')" prop="bizTag">
           <el-input v-model="editForm.bizTag" :placeholder="$t('INFRA_G2RAIN_RAINDROP_PH_BIZ_TAG', '请输入业务标签')" />
         </el-form-item>

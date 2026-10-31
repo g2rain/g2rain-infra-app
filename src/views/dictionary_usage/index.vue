@@ -35,7 +35,7 @@
       <el-table-column prop="usageName" :label="$t('INFRA_DICTIONARY_USAGE_FIELD_NAME', '用途名称')" width="280" />
       <TableColumn prop="createTime" :label="$t('G2_FIELD_CREATE_TIME', '创建时间')" width="180" :sortable="true" />
       <TableColumn prop="updateTime" :label="$t('G2_FIELD_UPDATE_TIME', '更新时间')" width="180" :sortable="true" />
-      <el-table-column :label="$t('G2_FIELD_ACTION', '操作')" fixed="right" width="210">
+      <el-table-column :label="$t('G2_FIELD_ACTION', '操作')" fixed="right" width="280">
         <template #default="{ row }">
           <el-button type="primary" link size="small" @click="handleView(row)">{{ $t('G2_BTN_DETAIL', '明细') }}</el-button>
           <el-button type="primary" v-permission="'dictionary_usage:items'" link size="small" @click="openDictionaryItems(row)">{{ $t('INFRA_DICTIONARY_USAGE_BTN_ITEMS', '字典项') }}</el-button>
@@ -66,7 +66,7 @@
 
     <!-- 新增 / 编辑弹窗 -->
     <el-dialog v-model="editDialogVisible" :title="editDialogTitle" width="520px">
-      <el-form ref="editFormRef" :model="editForm" :rules="editRules" label-width="100px">
+      <el-form ref="editFormRef" :model="editForm" :rules="editRules" label-width="140px">
         <el-form-item :label="$t('INFRA_DICTIONARY_USAGE_FIELD_CODE', '用途编码')" prop="usageCode">
           <el-input v-model="editForm.usageCode" :placeholder="$t('INFRA_DICTIONARY_USAGE_PH_CODE', '请输入用途编码')" />
         </el-form-item>

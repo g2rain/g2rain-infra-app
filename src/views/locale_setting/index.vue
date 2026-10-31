@@ -5,13 +5,13 @@
       <!-- 基础查询表单（BaseSelectListDto） -->
       <QueryForm ref="queryFormRef" v-model="baseQueryForm" @search="handleSearch">
         <!-- 业务特定查询字段 -->
-        <el-form-item :label="$t('INFRA_LOCALE_SETTING_FIELD_CODE', '编码')">
+        <el-form-item :label="$t('G2_FIELD_CODE', '编码')">
           <el-select v-model="queryForm.code" :placeholder="$t('INFRA_LOCALE_SETTING_PH_CODE', '请选择编码')" clearable filterable style="width: 200px">
             <el-option v-for="item in localeOptions" :key="item.value" :label="item.label" :value="item.value" />
           </el-select>
         </el-form-item>
-        <el-form-item :label="$t('INFRA_LOCALE_SETTING_FIELD_NAME', '名称')">
-          <el-input v-model="queryForm.name" :placeholder="$t('INFRA_LOCALE_SETTING_PH_NAME', '请输入名称')" clearable style="width: 200px" />
+        <el-form-item :label="$t('G2_FIELD_NAME', '名称')">
+          <el-input v-model="queryForm.name" :placeholder="$t('G2_PH_NAME', '请输入名称')" clearable style="width: 200px" />
         </el-form-item>
         <!-- 操作按钮 -->
         <template #actions>
@@ -35,8 +35,8 @@
 
     <SortableTable :data="tableData" border stripe style="width: 100%" :enable-multi-sort="true" @sort-change="handleSortChange">
       <el-table-column prop="id" :label="$t('INFRA_LOCALE_SETTING_COL_ID', '地区语言标识')" width="130" />
-      <el-table-column prop="code" :label="$t('INFRA_LOCALE_SETTING_FIELD_CODE', '编码')" width="180" />
-      <el-table-column prop="name" :label="$t('INFRA_LOCALE_SETTING_FIELD_NAME', '名称')" width="180" />
+      <el-table-column prop="code" :label="$t('G2_FIELD_CODE', '编码')" width="180" />
+      <el-table-column prop="name" :label="$t('G2_FIELD_NAME', '名称')" width="180" />
       <el-table-column prop="sortIndex" :label="$t('G2_LBL_SORT', '排序')" width="140" />
       <TableColumn prop="createTime" :label="$t('G2_FIELD_CREATE_TIME', '创建时间')" width="180" :sortable="true" />
       <TableColumn prop="updateTime" :label="$t('G2_FIELD_UPDATE_TIME', '更新时间')" width="180" :sortable="true" />
@@ -71,13 +71,13 @@
     <!-- 新增 / 编辑弹窗 -->
     <el-dialog v-model="editDialogVisible" :title="editDialogTitle" width="520px">
       <el-form ref="editFormRef" :model="editForm" :rules="editRules" label-width="120px">
-        <el-form-item :label="$t('INFRA_LOCALE_SETTING_FIELD_CODE', '编码')" prop="code">
+        <el-form-item :label="$t('G2_FIELD_CODE', '编码')" prop="code">
           <el-select v-model="editForm.code" :disabled="isEdit" :placeholder="$t('INFRA_LOCALE_SETTING_PH_CODE', '请选择编码')" filterable style="width: 200px">
             <el-option v-for="item in localeOptions" :key="item.value" :label="item.label" :value="item.value" />
           </el-select>
         </el-form-item>
-        <el-form-item :label="$t('INFRA_LOCALE_SETTING_FIELD_NAME', '名称')" prop="name">
-          <el-input v-model="editForm.name" :placeholder="$t('INFRA_LOCALE_SETTING_PH_NAME', '请输入名称')" />
+        <el-form-item :label="$t('G2_FIELD_NAME', '名称')" prop="name">
+          <el-input v-model="editForm.name" :placeholder="$t('G2_PH_NAME', '请输入名称')" />
         </el-form-item>
         <el-form-item :label="$t('G2_LBL_SORT', '排序')" prop="sortIndex">
           <el-input-number
@@ -86,12 +86,12 @@
             :step="1"
             :precision="0"
             controls-position="right"
-            :placeholder="$t('INFRA_LOCALE_SETTING_PH_SORT', '请输入排序')"
+            :placeholder="$t('G2_PH_SORT', '请输入排序')"
             style="width: 100%"
           />
         </el-form-item>
-        <el-form-item :label="$t('INFRA_LOCALE_SETTING_FIELD_DESC', '描述')" prop="description">
-          <el-input v-model="editForm.description" :placeholder="$t('INFRA_LOCALE_SETTING_PH_DESC', '请输入描述')" />
+        <el-form-item :label="$t('G2_FIELD_DESC', '描述')" prop="description">
+          <el-input v-model="editForm.description" :placeholder="$t('G2_PH_DESC', '请输入描述')" />
         </el-form-item>
       </el-form>
       <template #footer>
@@ -105,14 +105,14 @@
     <!-- 明细弹窗 -->
     <el-dialog v-model="detailDialogVisible" :title="$t('INFRA_LOCALE_SETTING_DETAIL', '地区语言明细')" width="520px">
       <el-descriptions :column="1" border>
-        <el-descriptions-item :label="$t('INFRA_LOCALE_SETTING_FIELD_CODE', '编码')">
+        <el-descriptions-item :label="$t('G2_FIELD_CODE', '编码')">
           <el-tag>
             {{localeOptions.find(item => item.value === currentRow?.code)?.label || ''}}
           </el-tag>
         </el-descriptions-item>
-        <el-descriptions-item :label="$t('INFRA_LOCALE_SETTING_FIELD_NAME', '名称')">{{ currentRow?.name }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('G2_FIELD_NAME', '名称')">{{ currentRow?.name }}</el-descriptions-item>
         <el-descriptions-item :label="$t('G2_LBL_SORT', '排序')">{{ currentRow?.sortIndex }}</el-descriptions-item>
-        <el-descriptions-item :label="$t('INFRA_LOCALE_SETTING_FIELD_DESC', '描述')">{{ currentRow?.description }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('G2_FIELD_DESC', '描述')">{{ currentRow?.description }}</el-descriptions-item>
         <el-descriptions-item :label="$t('G2_FIELD_CREATE_TIME', '创建时间')">{{ currentRow?.createTime }}</el-descriptions-item>
         <el-descriptions-item :label="$t('G2_FIELD_UPDATE_TIME', '更新时间')">{{ currentRow?.updateTime }}</el-descriptions-item>
       </el-descriptions>
@@ -291,9 +291,9 @@ const editDialogTitle = computed(() =>
 
 // 表单校验规则
 const editRules = computed<FormRules>(() => ({
-  code: [{ required: true, message: t('INFRA_LOCALE_SETTING_VLD_CODE', '请输入编码'), trigger: 'blur' }],
-  name: [{ required: true, message: t('INFRA_LOCALE_SETTING_VLD_NAME', '请输入名称'), trigger: 'blur' }],
-  sortIndex: [{ required: true, message: t('INFRA_LOCALE_SETTING_VLD_SORT', '请输入排序'), trigger: 'blur' }],
+  code: [{ required: true, message: t('G2_PH_CODE', '请输入编码'), trigger: 'blur' }],
+  name: [{ required: true, message: t('G2_PH_NAME', '请输入名称'), trigger: 'blur' }],
+  sortIndex: [{ required: true, message: t('G2_PH_SORT', '请输入排序'), trigger: 'blur' }],
 }));
 
 // 打开创建弹窗

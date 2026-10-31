@@ -41,9 +41,9 @@
             <el-option v-for="item in queryRegionSelectOptions" :key="item.value" :label="item.label" :value="item.value" />
           </el-select>
         </el-form-item>
-        <el-form-item v-if="queryForm.messageUsageCode === MESSAGE_USAGE_UI_MESSAGE" :label="$t('INFRA_I18N_MESSAGE_FIELD_TAG', '标签')">
-          <el-select v-model="queryForm.tag" :placeholder="$t('INFRA_I18N_MESSAGE_PH_TAG', '请选择标签')" clearable filterable style="width: 200px">
-            <el-option v-for="item in tagOptions" :key="item.value" :label="item.label" :value="item.value" />
+        <el-form-item v-if="usageNeedsTag(queryForm.messageUsageCode)" :label="$t('G2_FIELD_TAG', '标签')">
+          <el-select v-model="queryForm.tag" :placeholder="queryTagPlaceholder" clearable filterable style="width: 200px">
+            <el-option v-for="item in queryTagSelectOptions" :key="item.value" :label="item.label" :value="item.value" />
           </el-select>
         </el-form-item>
         <el-form-item :label="$t('INFRA_I18N_MESSAGE_FIELD_MESSAGE_CODE', '消息编码')">
@@ -71,16 +71,16 @@
 
     <SortableTable :data="tableData" border stripe style="width: 100%" :enable-multi-sort="true" @sort-change="handleSortChange">
       <el-table-column prop="id" :label="$t('G2_FIELD_ID', 'ID')" width="120" />
-      <el-table-column prop="messageUsageName" :label="$t('INFRA_I18N_MESSAGE_COL_USAGE', '国际化信息用途')" width="130">
+      <el-table-column prop="messageUsageName" :label="$t('INFRA_I18N_MESSAGE_COL_USAGE', '国际化信息用途')" width="180">
         <template #default="{ row }">
           <el-tag>
             {{usageOptions.find(item => item.value === row?.messageUsageCode)?.label || ''}}
           </el-tag>  
         </template>
       </el-table-column>
-      <el-table-column prop="languageCode" :label="$t('INFRA_I18N_MESSAGE_FIELD_LANGUAGE_CODE', '语言代码')" width="90" />
-      <el-table-column prop="regionCode" :label="$t('INFRA_I18N_MESSAGE_FIELD_REGION_CODE', '区域代码')" width="90" />
-      <el-table-column prop="tag" :label="$t('INFRA_I18N_MESSAGE_FIELD_TAG', '标签')" width="120" />
+      <el-table-column prop="languageCode" :label="$t('INFRA_I18N_MESSAGE_FIELD_LANGUAGE_CODE', '语言代码')" width="180" />
+      <el-table-column prop="regionCode" :label="$t('INFRA_I18N_MESSAGE_FIELD_REGION_CODE', '区域代码')" width="180" />
+      <el-table-column prop="tag" :label="$t('G2_FIELD_TAG', '标签')" width="120" />
       <el-table-column prop="messageCode" :label="$t('INFRA_I18N_MESSAGE_FIELD_MESSAGE_CODE', '消息编码')" width="380" />
       <TableColumn prop="createTime" :label="$t('G2_FIELD_CREATE_TIME', '创建时间')" width="180" :sortable="true" />
       <TableColumn prop="updateTime" :label="$t('G2_FIELD_UPDATE_TIME', '更新时间')" width="180" :sortable="true" />
@@ -114,7 +114,7 @@
 
     <!-- 新增 / 编辑弹窗 -->
     <el-dialog v-model="editDialogVisible" :title="editDialogTitle" width="520px">
-      <el-form ref="editFormRef" :model="editForm" :rules="editRules" label-width="130px">
+      <el-form ref="editFormRef" :model="editForm" :rules="editRules" label-width="180px">
         <el-form-item :label="$t('INFRA_I18N_MESSAGE_COL_USAGE', '国际化信息用途')" prop="messageUsageCode">
           <el-select
             v-model="editForm.messageUsageCode"
@@ -127,10 +127,10 @@
             <el-option v-for="item in usageOptions" :key="item.value" :label="item.label" :value="item.value" />
           </el-select>
         </el-form-item>
-        <el-form-item v-if="showEditTagField" :label="$t('INFRA_I18N_MESSAGE_FIELD_TAG', '标签')" prop="tag">
+        <el-form-item v-if="showEditTagField" :label="$t('G2_FIELD_TAG', '标签')" prop="tag">
           <el-select
             v-model="editForm.tag"
-            :placeholder="$t('INFRA_I18N_MESSAGE_PH_TAG_INPUT', '请选择或输入标签')"
+            :placeholder="editTagPlaceholder"
             clearable
             filterable
             allow-create
@@ -192,7 +192,7 @@
         </el-descriptions-item>
         <el-descriptions-item :label="$t('INFRA_I18N_MESSAGE_FIELD_LANGUAGE_CODE', '语言代码')">{{ currentRow?.languageCode }}</el-descriptions-item>
         <el-descriptions-item :label="$t('INFRA_I18N_MESSAGE_FIELD_REGION_CODE', '区域代码')">{{ currentRow?.regionCode }}</el-descriptions-item>
-        <el-descriptions-item v-if="currentRow?.messageUsageCode === MESSAGE_USAGE_UI_MESSAGE" :label="$t('INFRA_I18N_MESSAGE_FIELD_TAG', '标签')">
+        <el-descriptions-item v-if="usageNeedsTag(currentRow?.messageUsageCode)" :label="$t('G2_FIELD_TAG', '标签')">
           {{ currentRow?.tag }}
         </el-descriptions-item>
         <el-descriptions-item :label="$t('INFRA_I18N_MESSAGE_FIELD_MESSAGE_CODE', '消息编码')">{{ currentRow?.messageCode }}</el-descriptions-item>
@@ -217,6 +217,7 @@ import { ElMessage, ElMessageBox } from 'element-plus';
 import { t } from '@platform/i18n';
 import { I18nMessageApi } from './api';
 import { LocaleSettingApi, type LanguageCountriesMap } from '../locale_setting/api';
+import { DictionaryUsageApi } from '../dictionary_usage/api';
 import type { I18nMessage, I18nMessagePayload, I18nMessageQuery } from './type';
 import type { BaseSelectListDto, PageSelectListDto } from '@platform/types/api.type';
 
@@ -224,12 +225,16 @@ import { SortableTable, TableColumn, SortManagerButton, QueryForm } from '@g2rai
 import { storeToRefs } from 'pinia';
 import { useLocaleStore } from '@platform/stores/locale.store';
 
-/** UI 文案类国际化用途编码 */
+/** 需要填写标签的国际化用途 */
 const MESSAGE_USAGE_UI_MESSAGE = 'UI_MESSAGE';
+const MESSAGE_USAGE_DICTIONARY = 'DICTIONARY';
+const usageNeedsTag = (code?: string | null) =>
+  code === MESSAGE_USAGE_UI_MESSAGE || code === MESSAGE_USAGE_DICTIONARY;
 
 // 定义字典引用
 const usageOptions = ref<Array<{ label: string; value: string }>>([]);
 const tagOptions = ref<Array<{ label: string; value: string }>>([]);
+const dictionaryUsageOptions = ref<Array<{ label: string; value: string }>>([]);
 
 /** 语言 → 区域代码列表（来自 get_language_countries） */
 const languageCountryMap = ref<LanguageCountriesMap>({});
@@ -267,11 +272,28 @@ const editRegionSelectOptions = computed(() => {
   return opts;
 });
 
-const showEditTagField = computed(() => editForm.messageUsageCode === MESSAGE_USAGE_UI_MESSAGE);
+const showEditTagField = computed(() => usageNeedsTag(editForm.messageUsageCode));
 
-/** 编辑弹窗：若已有 tag 不在字典中，仍展示为可选项 */
+const tagOptionsForUsage = (usageCode: string) =>
+  usageCode === MESSAGE_USAGE_DICTIONARY ? dictionaryUsageOptions.value : tagOptions.value;
+
+const queryTagSelectOptions = computed(() => tagOptionsForUsage(queryForm.messageUsageCode));
+
+const queryTagPlaceholder = computed(() =>
+  queryForm.messageUsageCode === MESSAGE_USAGE_DICTIONARY
+    ? t('INFRA_I18N_MESSAGE_PH_TAG_DICT', '请选择字典用途编码')
+    : t('INFRA_I18N_MESSAGE_PH_TAG', '请选择标签'),
+);
+
+const editTagPlaceholder = computed(() =>
+  editForm.messageUsageCode === MESSAGE_USAGE_DICTIONARY
+    ? t('INFRA_I18N_MESSAGE_PH_TAG_INPUT_DICT', '请选择或填写字典用途编码')
+    : t('INFRA_I18N_MESSAGE_PH_TAG_INPUT', '请选择或输入标签'),
+);
+
+/** 编辑弹窗：若已有 tag 不在选项中，仍展示为可选项 */
 const editTagSelectOptions = computed(() => {
-  const base = tagOptions.value;
+  const base = tagOptionsForUsage(editForm.messageUsageCode);
   const tag = editForm.tag;
   if (tag && !base.some(o => o.value === tag)) {
     return [...base, { value: tag, label: tag }];
@@ -294,16 +316,12 @@ const onEditLanguageChange = () => {
 };
 
 const onEditMessageUsageChange = () => {
-  if (editForm.messageUsageCode !== MESSAGE_USAGE_UI_MESSAGE) {
-    editForm.tag = '';
-    editFormRef.value?.clearValidate('tag');
-  }
+  editForm.tag = '';
+  editFormRef.value?.clearValidate('tag');
 };
 
 const onQueryMessageUsageChange = () => {
-  if (queryForm.messageUsageCode !== MESSAGE_USAGE_UI_MESSAGE) {
-    queryForm.tag = '';
-  }
+  queryForm.tag = '';
 };
 
 // 获取字典信息
@@ -319,6 +337,16 @@ const loadDicts = async () => {
     value: tag,
     label: tag,
   }));
+
+  try {
+    const usages = await DictionaryUsageApi.list();
+    dictionaryUsageOptions.value = usages.map(u => ({
+      value: u.usageCode,
+      label: u.usageName ? `${u.usageCode}（${u.usageName}）` : u.usageCode,
+    }));
+  } catch {
+    // 请求失败已由 http 层统一提示
+  }
 
   try {
     languageCountryMap.value = await LocaleSettingApi.getLanguageCountries();
@@ -535,7 +563,7 @@ const submitEdit = async () => {
     messageCode: editForm.messageCode,
     messageText: editForm.messageText,
     extendField: editForm.extendField,
-    tag: editForm.messageUsageCode === MESSAGE_USAGE_UI_MESSAGE ? editForm.tag : undefined,
+    tag: usageNeedsTag(editForm.messageUsageCode) ? editForm.tag : undefined,
   };
 
   // 编辑模式下，将 id 添加到 payload 中
@@ -544,7 +572,7 @@ const submitEdit = async () => {
   }
   await I18nMessageApi.save(payload);
 
-  if (!isEdit.value && editForm.messageUsageCode === MESSAGE_USAGE_UI_MESSAGE) {
+  if (!isEdit.value && usageNeedsTag(editForm.messageUsageCode)) {
     await loadDicts();
   }
   ElMessage.success(isEdit.value ? t('G2_MSG_UPDATE_OK', '更新成功') : t('G2_MSG_ADD_OK', '新增成功'));

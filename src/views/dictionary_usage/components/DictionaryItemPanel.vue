@@ -5,11 +5,11 @@
         <el-form-item :label="$t('INFRA_DICTIONARY_ITEM_FIELD_PARENT', '上级节点')">
           <el-input v-model="queryForm.parentId" :placeholder="$t('INFRA_DICTIONARY_ITEM_PH_PARENT', '请输入上级节点')" clearable style="width: 200px" />
         </el-form-item>
-        <el-form-item :label="$t('INFRA_DICTIONARY_ITEM_FIELD_CODE', '编码')">
-          <el-input v-model="queryForm.code" :placeholder="$t('INFRA_DICTIONARY_ITEM_PH_CODE', '请输入编码')" clearable style="width: 200px" />
+        <el-form-item :label="$t('G2_FIELD_CODE', '编码')">
+          <el-input v-model="queryForm.code" :placeholder="$t('G2_PH_CODE', '请输入编码')" clearable style="width: 200px" />
         </el-form-item>
-        <el-form-item :label="$t('INFRA_DICTIONARY_ITEM_FIELD_NAME', '名称')">
-          <el-input v-model="queryForm.name" :placeholder="$t('INFRA_DICTIONARY_ITEM_PH_NAME', '请输入名称')" clearable style="width: 200px" />
+        <el-form-item :label="$t('G2_FIELD_NAME', '名称')">
+          <el-input v-model="queryForm.name" :placeholder="$t('G2_PH_NAME', '请输入名称')" clearable style="width: 200px" />
         </el-form-item>
         <template #actions>
           <el-form-item>
@@ -36,9 +36,9 @@
           {{ row.parentName || $t('INFRA_DICTIONARY_ITEM_LBL_ROOT', '根节点') }}
         </template>
       </el-table-column>
-      <el-table-column prop="code" :label="$t('INFRA_DICTIONARY_ITEM_FIELD_CODE', '编码')" width="180" />
-      <el-table-column prop="name" :label="$t('INFRA_DICTIONARY_ITEM_FIELD_NAME', '名称')" width="180" />
-      <el-table-column prop="sortIndex" :label="$t('G2_LBL_SORT', '排序')" width="60" />
+      <el-table-column prop="code" :label="$t('G2_FIELD_CODE', '编码')" width="180" />
+      <el-table-column prop="name" :label="$t('G2_FIELD_NAME', '名称')" width="180" />
+      <el-table-column prop="sortIndex" :label="$t('G2_LBL_SORT', '排序')" width="100" />
       <TableColumn prop="createTime" :label="$t('G2_FIELD_CREATE_TIME', '创建时间')" width="180" :sortable="true" />
       <TableColumn prop="updateTime" :label="$t('G2_FIELD_UPDATE_TIME', '更新时间')" width="180" :sortable="true" />
       <el-table-column :label="$t('G2_FIELD_ACTION', '操作')" fixed="right" width="280">
@@ -84,11 +84,11 @@
             style="width: 100%"
           />
         </el-form-item>
-        <el-form-item :label="$t('INFRA_DICTIONARY_ITEM_FIELD_CODE', '编码')" prop="code">
-          <el-input v-model="editForm.code" :placeholder="$t('INFRA_DICTIONARY_ITEM_PH_CODE', '请输入编码')" />
+        <el-form-item :label="$t('G2_FIELD_CODE', '编码')" prop="code">
+          <el-input v-model="editForm.code" :placeholder="$t('G2_PH_CODE', '请输入编码')" />
         </el-form-item>
-        <el-form-item :label="$t('INFRA_DICTIONARY_ITEM_FIELD_NAME', '名称')" prop="name">
-          <el-input v-model="editForm.name" :placeholder="$t('INFRA_DICTIONARY_ITEM_PH_NAME', '请输入名称')" />
+        <el-form-item :label="$t('G2_FIELD_NAME', '名称')" prop="name">
+          <el-input v-model="editForm.name" :placeholder="$t('G2_PH_NAME', '请输入名称')" />
         </el-form-item>
         <el-form-item :label="$t('G2_LBL_SORT', '排序')" prop="sortIndex">
           <el-input-number
@@ -97,7 +97,7 @@
             :step="1"
             :precision="0"
             controls-position="right"
-            :placeholder="$t('INFRA_DICTIONARY_ITEM_PH_SORT', '请输入排序')"
+            :placeholder="$t('G2_PH_SORT', '请输入排序')"
             style="width: 100%"
           />
         </el-form-item>
@@ -117,8 +117,8 @@
       <el-descriptions :column="1" border>
         <el-descriptions-item :label="$t('INFRA_DICTIONARY_ITEM_COL_ID', '当前节点')">{{ currentRow?.id }}</el-descriptions-item>
         <el-descriptions-item :label="$t('INFRA_DICTIONARY_ITEM_FIELD_PARENT', '上级节点')">{{ currentRow?.parentName }}</el-descriptions-item>
-        <el-descriptions-item :label="$t('INFRA_DICTIONARY_ITEM_FIELD_CODE', '编码')">{{ currentRow?.code }}</el-descriptions-item>
-        <el-descriptions-item :label="$t('INFRA_DICTIONARY_ITEM_FIELD_NAME', '名称')">{{ currentRow?.name }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('G2_FIELD_CODE', '编码')">{{ currentRow?.code }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('G2_FIELD_NAME', '名称')">{{ currentRow?.name }}</el-descriptions-item>
         <el-descriptions-item :label="$t('G2_LBL_SORT', '排序')">{{ currentRow?.sortIndex }}</el-descriptions-item>
         <el-descriptions-item :label="$t('G2_FIELD_DESC', '描述')">{{ currentRow?.description }}</el-descriptions-item>
         <el-descriptions-item :label="$t('G2_FIELD_CREATE_TIME', '创建时间')">{{ currentRow?.createTime }}</el-descriptions-item>
@@ -283,9 +283,9 @@ const editDialogTitle = computed(() =>
 
 // 表单校验规则 
 const editRules = computed<FormRules>(() => ({
-  code: [{ required: true, message: t('INFRA_DICTIONARY_ITEM_VLD_CODE', '请输入编码'), trigger: 'blur' }],
-  name: [{ required: true, message: t('INFRA_DICTIONARY_ITEM_VLD_NAME', '请输入名称'), trigger: 'blur' }],
-  sortIndex: [{ required: true, message: t('INFRA_DICTIONARY_ITEM_VLD_SORT', '请输入排序'), trigger: 'blur' }],
+  code: [{ required: true, message: t('G2_PH_CODE', '请输入编码'), trigger: 'blur' }],
+  name: [{ required: true, message: t('G2_PH_NAME', '请输入名称'), trigger: 'blur' }],
+  sortIndex: [{ required: true, message: t('G2_PH_SORT', '请输入排序'), trigger: 'blur' }],
 }));
 
 // 打开创建弹窗

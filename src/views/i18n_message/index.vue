@@ -71,17 +71,17 @@
 
     <SortableTable :data="tableData" border stripe style="width: 100%" :enable-multi-sort="true" @sort-change="handleSortChange">
       <el-table-column prop="id" :label="$t('G2_FIELD_ID', 'ID')" width="120" />
-      <el-table-column prop="messageUsageName" :label="$t('INFRA_I18N_MESSAGE_COL_USAGE', '国际化信息用途')" width="160">
+      <el-table-column prop="messageUsageName" :label="$t('INFRA_I18N_MESSAGE_COL_USAGE', '国际化信息用途')" width="130">
         <template #default="{ row }">
           <el-tag>
             {{usageOptions.find(item => item.value === row?.messageUsageCode)?.label || ''}}
           </el-tag>  
         </template>
       </el-table-column>
-      <el-table-column prop="languageCode" :label="$t('INFRA_I18N_MESSAGE_FIELD_LANGUAGE_CODE', '语言代码')" width="180" />
-      <el-table-column prop="regionCode" :label="$t('INFRA_I18N_MESSAGE_FIELD_REGION_CODE', '区域代码')" width="180" />
-      <el-table-column prop="tag" :label="$t('INFRA_I18N_MESSAGE_FIELD_TAG', '标签')" width="160" />
-      <el-table-column prop="messageCode" :label="$t('INFRA_I18N_MESSAGE_FIELD_MESSAGE_CODE', '消息编码')" width="180" />
+      <el-table-column prop="languageCode" :label="$t('INFRA_I18N_MESSAGE_FIELD_LANGUAGE_CODE', '语言代码')" width="90" />
+      <el-table-column prop="regionCode" :label="$t('INFRA_I18N_MESSAGE_FIELD_REGION_CODE', '区域代码')" width="90" />
+      <el-table-column prop="tag" :label="$t('INFRA_I18N_MESSAGE_FIELD_TAG', '标签')" width="120" />
+      <el-table-column prop="messageCode" :label="$t('INFRA_I18N_MESSAGE_FIELD_MESSAGE_CODE', '消息编码')" width="380" />
       <TableColumn prop="createTime" :label="$t('G2_FIELD_CREATE_TIME', '创建时间')" width="180" :sortable="true" />
       <TableColumn prop="updateTime" :label="$t('G2_FIELD_UPDATE_TIME', '更新时间')" width="180" :sortable="true" />
       <el-table-column :label="$t('G2_FIELD_ACTION', '操作')" fixed="right" width="280">

@@ -38,7 +38,7 @@
       </el-table-column>
       <el-table-column prop="code" :label="$t('INFRA_DICTIONARY_ITEM_FIELD_CODE', '编码')" width="180" />
       <el-table-column prop="name" :label="$t('INFRA_DICTIONARY_ITEM_FIELD_NAME', '名称')" width="180" />
-      <el-table-column prop="sortIndex" :label="$t('G2_LBL_SORT', '排序')" width="140" />
+      <el-table-column prop="sortIndex" :label="$t('G2_LBL_SORT', '排序')" width="60" />
       <TableColumn prop="createTime" :label="$t('G2_FIELD_CREATE_TIME', '创建时间')" width="180" :sortable="true" />
       <TableColumn prop="updateTime" :label="$t('G2_FIELD_UPDATE_TIME', '更新时间')" width="180" :sortable="true" />
       <el-table-column :label="$t('G2_FIELD_ACTION', '操作')" fixed="right" width="280">

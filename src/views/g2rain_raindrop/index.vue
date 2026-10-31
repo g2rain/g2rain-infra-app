@@ -35,10 +35,10 @@
     </div>
 
     <SortableTable :data="tableData" border stripe style="width: 100%" :enable-multi-sort="true" @sort-change="handleSortChange">
-      <el-table-column prop="id" :label="$t('INFRA_G2RAIN_RAINDROP_COL_ID', '发号器标识')" width="120" />
-      <el-table-column prop="bizTag" :label="$t('INFRA_G2RAIN_RAINDROP_FIELD_BIZ_TAG', '业务标签')" width="180" />
-      <el-table-column prop="maxId" :label="$t('INFRA_G2RAIN_RAINDROP_FIELD_MAX_ID', '最大 ID')" width="140" />
-      <el-table-column prop="step" :label="$t('INFRA_G2RAIN_RAINDROP_FIELD_STEP', '步长')" width="140" />
+      <el-table-column prop="id" :label="$t('INFRA_G2RAIN_RAINDROP_COL_ID', '发号器标识')" width="130" />
+      <el-table-column prop="bizTag" :label="$t('INFRA_G2RAIN_RAINDROP_FIELD_BIZ_TAG', '业务标签')" width="200" />
+      <el-table-column prop="maxId" :label="$t('INFRA_G2RAIN_RAINDROP_FIELD_MAX_ID', '最大 ID')" width="150" />
+      <el-table-column prop="step" :label="$t('INFRA_G2RAIN_RAINDROP_FIELD_STEP', '步长')" width="150" />
       <TableColumn prop="createTime" :label="$t('G2_FIELD_CREATE_TIME', '创建时间')" width="180" :sortable="true" />
       <TableColumn prop="updateTime" :label="$t('G2_FIELD_UPDATE_TIME', '更新时间')" width="180" :sortable="true" />
       <el-table-column :label="$t('G2_FIELD_ACTION', '操作')" fixed="right" width="280">

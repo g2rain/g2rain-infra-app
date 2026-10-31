@@ -30,10 +30,9 @@
     </div>
 
     <SortableTable :data="tableData" border stripe style="width: 100%" :enable-multi-sort="true" @sort-change="handleSortChange">
-      <el-table-column prop="id" :label="$t('INFRA_DICTIONARY_USAGE_COL_ID', '用途标识')" width="210" />
-      <el-table-column prop="usageCode" :label="$t('INFRA_DICTIONARY_USAGE_FIELD_CODE', '用途编码')" width="210" />
-      <el-table-column prop="usageName" :label="$t('INFRA_DICTIONARY_USAGE_FIELD_NAME', '用途名称')" width="210" />
-      <el-table-column prop="description" :label="$t('G2_FIELD_DESC', '描述')" width="280" />
+      <el-table-column prop="id" :label="$t('INFRA_DICTIONARY_USAGE_COL_ID', '用途标识')" width="132" />
+      <el-table-column prop="usageCode" :label="$t('INFRA_DICTIONARY_USAGE_FIELD_CODE', '用途编码')" width="280" />
+      <el-table-column prop="usageName" :label="$t('INFRA_DICTIONARY_USAGE_FIELD_NAME', '用途名称')" width="280" />
       <TableColumn prop="createTime" :label="$t('G2_FIELD_CREATE_TIME', '创建时间')" width="180" :sortable="true" />
       <TableColumn prop="updateTime" :label="$t('G2_FIELD_UPDATE_TIME', '更新时间')" width="180" :sortable="true" />
       <el-table-column :label="$t('G2_FIELD_ACTION', '操作')" fixed="right" width="210">

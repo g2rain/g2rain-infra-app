@@ -8,7 +8,7 @@ ARG VITE_BUILD_MODE=production
 COPY package.json package-lock.json .npmrc ./
 # create-g2rain-app 为 file:../g2rain-app-cli；镜像构建不需要 CLI，放最小 stub 以满足 npm ci
 RUN mkdir -p /g2rain-app-cli \
- && printf '%s\n' '{"name":"create-g2rain-app","version":"0.1.0","private":true}' > /g2rain-app-cli/package.json
+ && printf '%s\n' '{"name":"create-g2rain-app","version":"1.0.1","private":true}' > /g2rain-app-cli/package.json
 RUN --mount=type=cache,target=/root/.npm \
     npm ci --legacy-peer-deps --no-audit --no-fund --loglevel=warn
 
@@ -20,20 +20,26 @@ RUN echo "🔨 构建模式: $VITE_BUILD_MODE"
 RUN echo "📁 检查配置文件:" && ls -la vite.config.* && \
     echo "📁 检查环境文件:" && ls -la .env*
 
-RUN if [ -n "$VITE_BUILD_MODE" ]; then \
-        echo "🏗️ 使用指定的构建模式: $VITE_BUILD_MODE"; \
-        npx vite build --mode $VITE_BUILD_MODE; \
-        echo "✅ $VITE_BUILD_MODE 模式构建完成"; \
-    else \
-        echo "🚀 VITE_BUILD_MODE 未设置，使用默认模式: production"; \
-        npx vite build --mode production; \
-        echo "✅ production 模式构建完成"; \
-    fi
+RUN if [ "$VITE_BUILD_MODE" != "production" ]; then \
+        echo "Unsupported VITE_BUILD_MODE '$VITE_BUILD_MODE': the release image must use production." >&2; \
+        exit 1; \
+    fi; \
+    npm run build
 
 # ------------------------------------------------------------
 # 阶段 2：OpenResty + OpenSSL 3 + luaossl
 # ------------------------------------------------------------
 FROM openresty/openresty:alpine
+
+ARG IMAGE_VERSION=1.0.0
+ARG VCS_REF=unknown
+LABEL org.opencontainers.image.title="g2rain-infra-app" \
+      org.opencontainers.image.description="G2rain infrastructure management micro-frontend application" \
+      org.opencontainers.image.source="https://github.com/g2rain/g2rain-infra-app" \
+      org.opencontainers.image.url="https://github.com/g2rain/g2rain-infra-app" \
+      org.opencontainers.image.version="${IMAGE_VERSION}" \
+      org.opencontainers.image.revision="${VCS_REF}" \
+      org.opencontainers.image.licenses="Apache-2.0"
 
 RUN set -eux; \
     sed -i 's|dl-cdn.alpinelinux.org|mirrors.aliyun.com|g' /etc/apk/repositories; \
@@ -65,10 +71,12 @@ RUN set -eux; \
     /usr/local/openresty/luajit/bin/luajit -e 'local ok, m = pcall(require, "openssl"); print("luaossl load:", ok, m)'
 
 COPY --from=builder /app/dist /usr/local/openresty/nginx/html
-COPY lua/ /usr/local/openresty/nginx/lua/
-COPY nginx/default.conf.template /etc/nginx/conf.d/
-COPY nginx/docker-entrypoint.sh /
-RUN chmod +x /docker-entrypoint.sh || true
+COPY lua/config.lua lua/sign.lua lua/sign_api.lua /usr/local/openresty/nginx/lua/
+RUN mkdir -p /usr/local/openresty/nginx/lua/keys
+COPY nginx/default.conf.template /etc/nginx/conf.d/default.conf.template
+COPY nginx/docker-entrypoint.sh /docker-entrypoint.sh
+RUN sed -i 's/\r$//' /docker-entrypoint.sh \
+ && chmod +x /docker-entrypoint.sh
 
 RUN if [ ! -f /usr/local/openresty/nginx/lua/keys/private-key.der ] || [ ! -f /usr/local/openresty/nginx/lua/keys/public-key.der ]; then \
         echo "⚠️ Warning: missing key files under lua/keys (ignored in dev)"; \

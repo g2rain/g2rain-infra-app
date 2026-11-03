@@ -28,7 +28,6 @@ URL 的 `mode=alone` 优先于环境变量。
 | `GATEWAY_HOST`、`GATEWAY_PORT` | `/api/` 与 `/doc/` 代理目标 |
 | `IAM_HOST`、`IAM_PORT` | `/auth/` 代理目标 |
 | `SSO_BASE_URL` | 写入生成的 `env-config.js` 的公开 SSO 地址 |
-| `APPLICATION_CODE` | 可选；覆盖 Lua 签名使用的应用编码，默认 `g2rain-infra-app` |
 
-将 `public-key.der`、`private-key.der`（以及按 Nginx 端点需要的 `iam-key-id.txt`、`iam-public-key.pem`）以只读 Secret/Volume 挂载到 `/usr/local/openresty/nginx/lua/keys/`。密钥不能写入 `VITE_*`、`window._env_`、镜像层或源码；镜像只创建该目录，构建时不复制它。
+密钥文件通过部署 Secret/Volume 提供，不能写入环境公开配置或镜像源码层。
 

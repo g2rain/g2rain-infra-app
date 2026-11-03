@@ -29,10 +29,6 @@
 - [故障排查](operations/troubleshooting.md)
 - [安全边界](security/security-boundaries.md)
 
-## 发布
-
-- [发布记录](releases/README.md)
-
 ## 需求与协作
 
 - [需求索引与模板](requirements/README.md)

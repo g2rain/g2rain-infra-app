@@ -29,16 +29,16 @@
     <!-- 标题和操作按钮 -->
     <div class="g2rain_raindrop-page__header">
       <div class="g2rain_raindrop-page__title-group">
-        <h2>{{ $t('INFRA_G2RAIN_RAINDROP_TITLE', '管理发号器数据') }}</h2>
+        <h2>{{ $t('INFRA_G2RAIN_RAINDROP_TITLE', '发号器') }}</h2>
       </div>
       <el-button type="primary" v-permission="'g2rain_raindrop:add'" @click="handleCreate">{{ $t('INFRA_G2RAIN_RAINDROP_BTN_ADD', '新增发号器') }}</el-button>
     </div>
 
     <SortableTable :data="tableData" border stripe style="width: 100%" :enable-multi-sort="true" @sort-change="handleSortChange">
-      <el-table-column prop="id" :label="$t('INFRA_G2RAIN_RAINDROP_COL_ID', '发号器标识')" width="120" />
-      <el-table-column prop="bizTag" :label="$t('INFRA_G2RAIN_RAINDROP_FIELD_BIZ_TAG', '业务标签')" width="180" />
-      <el-table-column prop="maxId" :label="$t('INFRA_G2RAIN_RAINDROP_FIELD_MAX_ID', '最大 ID')" width="140" />
-      <el-table-column prop="step" :label="$t('INFRA_G2RAIN_RAINDROP_FIELD_STEP', '步长')" width="140" />
+      <el-table-column prop="id" :label="$t('INFRA_G2RAIN_RAINDROP_COL_ID', '发号器标识')" width="130" />
+      <el-table-column prop="bizTag" :label="$t('INFRA_G2RAIN_RAINDROP_FIELD_BIZ_TAG', '业务标签')" width="200" />
+      <el-table-column prop="maxId" :label="$t('INFRA_G2RAIN_RAINDROP_FIELD_MAX_ID', '最大 ID')" width="180" />
+      <el-table-column prop="step" :label="$t('INFRA_G2RAIN_RAINDROP_FIELD_STEP', '步长')" width="180" />
       <TableColumn prop="createTime" :label="$t('G2_FIELD_CREATE_TIME', '创建时间')" width="180" :sortable="true" />
       <TableColumn prop="updateTime" :label="$t('G2_FIELD_UPDATE_TIME', '更新时间')" width="180" :sortable="true" />
       <el-table-column :label="$t('G2_FIELD_ACTION', '操作')" fixed="right" width="280">
@@ -71,7 +71,7 @@
 
     <!-- 新增 / 编辑弹窗 -->
     <el-dialog v-model="editDialogVisible" :title="editDialogTitle" width="520px">
-      <el-form ref="editFormRef" :model="editForm" :rules="editRules" label-width="120px">
+      <el-form ref="editFormRef" :model="editForm" :rules="editRules" label-width="180px">
         <el-form-item :label="$t('INFRA_G2RAIN_RAINDROP_FIELD_BIZ_TAG', '业务标签')" prop="bizTag">
           <el-input v-model="editForm.bizTag" :placeholder="$t('INFRA_G2RAIN_RAINDROP_PH_BIZ_TAG', '请输入业务标签')" />
         </el-form-item>
@@ -146,7 +146,7 @@ import { G2rainRaindropApi } from './api';
 import type { G2rainRaindrop, G2rainRaindropPayload, G2rainRaindropQuery } from './type';
 import type { BaseSelectListDto, PageSelectListDto } from '@platform/types/api.type';
 
-import { SortableTable, TableColumn, SortManagerButton, QueryForm, showErrorMessage } from '@/components';
+import { SortableTable, TableColumn, SortManagerButton, QueryForm } from '@g2rain/ui';
 
 // 定义字典引用
 const tagOptions = ref<Array<{ label: string; value: string }>>([]);
@@ -164,7 +164,7 @@ const loadDicts = async () => {
 const queryFormRef = ref<InstanceType<typeof QueryForm> | null>(null);
 
 // 基础查询表单（BaseSelectListDto）
-let baseQueryForm = reactive<BaseSelectListDto>({
+const baseQueryForm = ref<BaseSelectListDto>({
   id: undefined,
   createTime: undefined,
   updateTime: undefined,
@@ -191,7 +191,7 @@ const loadData = async () => {
   try {
     // 合并基础查询 + 业务查询，并过滤空值
     const query = Object.fromEntries(
-      Object.entries({ ...baseQueryForm, ...queryForm })
+      Object.entries({ ...baseQueryForm.value, ...queryForm })
         .filter(([_, v]) => (v ?? '') !== '' && [v].flat().length)
     ) as G2rainRaindropQuery;
 
@@ -205,9 +205,8 @@ const loadData = async () => {
     // 设置响应结果 
     tableData.value = pageData.records;
     pagination.total = pageData.total;
-  } catch (error: unknown) {
-    const msg = error instanceof Error ? error.message : t('G2_MSG_LOAD_FAIL', '加载列表失败');
-    showErrorMessage(msg);
+  } catch {
+    // 请求失败已由 http 层统一提示
   }
 };
 
@@ -226,10 +225,9 @@ const handleSearch = () => {
 // 重置查询条件
 const handleReset = () => {
   // 重置基础查询表单
-  baseQueryForm.id = undefined;
-  baseQueryForm.createTime = undefined;
-  baseQueryForm.updateTime = undefined;
-  baseQueryForm.sorts = undefined;
+  baseQueryForm.value.id = undefined;
+  baseQueryForm.value.createTime = undefined;
+  baseQueryForm.value.updateTime = undefined;
   
   // 重置业务特定查询表单
   queryForm.bizTag = '';
@@ -267,25 +265,20 @@ const handleView = (row: G2rainRaindrop) => {
 // 删除数据记录
 const handleDelete = (row: G2rainRaindrop) => {
   ElMessageBox.confirm(
-    t('INFRA_G2RAIN_RAINDROP_DEL_CONFIRM', `确认删除发号器「${row.id}」吗？`),
+    t('INFRA_G2RAIN_RAINDROP_DEL_CONFIRM', { id: row.id }, '确认删除发号器「{id}」吗？'),
     t('G2_LBL_TIP', '提示'),
     { type: 'warning' },
   )
     .then(async () => {
-      try {
-        await G2rainRaindropApi.remove(row.id);
-        // 如果当前页只有一条数据，删除后应该跳转到上一页
-        if (tableData.value.length === 1 && pagination.pageNum > 1) {
-          pagination.pageNum--;
-        }
-
-        await loadDicts();
-        await loadData();
-        ElMessage.success(t('G2_MSG_DELETE_OK', '删除成功'));
-      } catch (error: unknown) {
-        const msg = error instanceof Error ? error.message : t('G2_MSG_DELETE_FAIL', '删除失败');
-        showErrorMessage(msg);
+      await G2rainRaindropApi.remove(row.id);
+      // 如果当前页只有一条数据，删除后应该跳转到上一页
+      if (tableData.value.length === 1 && pagination.pageNum > 1) {
+        pagination.pageNum--;
       }
+
+      await loadDicts();
+      await loadData();
+      ElMessage.success(t('G2_MSG_DELETE_OK', '删除成功'));
     })
     .catch(() => {});
 };
@@ -357,25 +350,20 @@ const submitEdit = async () => {
     description: editForm.description,
   };
 
-  try {
-    // 编辑模式下，将 id 添加到 payload 中
-    if (isEdit.value) {
-      payload.id = editForm.id;
-    }
-    await G2rainRaindropApi.save(payload);
-    ElMessage.success(isEdit.value ? t('G2_MSG_UPDATE_OK', '更新成功') : t('G2_MSG_ADD_OK', '新增成功'));
-    
-    // 保存功能需要查询字典
-    if (!isEdit.value) {
-      await loadDicts();
-    }
-
-    await loadData();
-    editDialogVisible.value = false;
-  } catch (error: unknown) {
-    const msg = error instanceof Error ? error.message : t('G2_MSG_SAVE_FAIL', '保存失败');
-    showErrorMessage(msg);
+  // 编辑模式下，将 id 添加到 payload 中
+  if (isEdit.value) {
+    payload.id = editForm.id;
   }
+  await G2rainRaindropApi.save(payload);
+  ElMessage.success(isEdit.value ? t('G2_MSG_UPDATE_OK', '更新成功') : t('G2_MSG_ADD_OK', '新增成功'));
+  
+  // 保存功能需要查询字典
+  if (!isEdit.value) {
+    await loadDicts();
+  }
+
+  await loadData();
+  editDialogVisible.value = false;
 };
 
 // 挂载回调
@@ -390,7 +378,7 @@ onMounted(async() => {
 <style scoped>
 .g2rain_raindrop-page {
   padding: 20px;
-  background-color: #f5f7fa;
+  background-color: var(--g2-bg-page);
   min-height: 100%;
   height: 100%;
   box-sizing: border-box;
@@ -403,7 +391,7 @@ onMounted(async() => {
   margin-bottom: 12px;
   margin-top: 0;
   padding: 16px 20px;
-  background-color: #fff;
+  background-color: var(--g2-bg-container);
   border-radius: 4px;
 }
 
@@ -428,7 +416,7 @@ onMounted(async() => {
 
 .g2rain_raindrop-page__search {
   margin-bottom: 12px;
-  background-color: #fff;
+  background-color: var(--g2-bg-container);
 }
 
 .g2rain_raindrop-page__pagination {

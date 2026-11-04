@@ -5,11 +5,11 @@
         <el-form-item :label="$t('INFRA_DICTIONARY_ITEM_FIELD_PARENT', '上级节点')">
           <el-input v-model="queryForm.parentId" :placeholder="$t('INFRA_DICTIONARY_ITEM_PH_PARENT', '请输入上级节点')" clearable style="width: 200px" />
         </el-form-item>
-        <el-form-item :label="$t('INFRA_DICTIONARY_ITEM_FIELD_CODE', '编码')">
-          <el-input v-model="queryForm.code" :placeholder="$t('INFRA_DICTIONARY_ITEM_PH_CODE', '请输入编码')" clearable style="width: 200px" />
+        <el-form-item :label="$t('G2_FIELD_CODE', '编码')">
+          <el-input v-model="queryForm.code" :placeholder="$t('G2_PH_CODE', '请输入编码')" clearable style="width: 200px" />
         </el-form-item>
-        <el-form-item :label="$t('INFRA_DICTIONARY_ITEM_FIELD_NAME', '名称')">
-          <el-input v-model="queryForm.name" :placeholder="$t('INFRA_DICTIONARY_ITEM_PH_NAME', '请输入名称')" clearable style="width: 200px" />
+        <el-form-item :label="$t('G2_FIELD_NAME', '名称')">
+          <el-input v-model="queryForm.name" :placeholder="$t('G2_PH_NAME', '请输入名称')" clearable style="width: 200px" />
         </el-form-item>
         <template #actions>
           <el-form-item>
@@ -22,7 +22,9 @@
 
     <div class="dictionary-item-panel__header">
       <div class="dictionary-item-panel__title-group">
-        <h3>{{ panelTitle }}</h3>
+        <h3>
+          {{ $t('INFRA_DICTIONARY_USAGE_LBL_ITEMS', '字典项') }}（{{ $t('INFRA_DICTIONARY_USAGE_TITLE', '字典用途') }}：{{ dictionaryUsageCode }}）
+        </h3>
       </div>
       <el-button type="primary" v-permission="'dictionary_item:add'" @click="handleCreate">{{ $t('INFRA_DICTIONARY_ITEM_BTN_ADD', '新增字典项') }}</el-button>
     </div>
@@ -34,9 +36,9 @@
           {{ row.parentName || $t('INFRA_DICTIONARY_ITEM_LBL_ROOT', '根节点') }}
         </template>
       </el-table-column>
-      <el-table-column prop="code" :label="$t('INFRA_DICTIONARY_ITEM_FIELD_CODE', '编码')" width="180" />
-      <el-table-column prop="name" :label="$t('INFRA_DICTIONARY_ITEM_FIELD_NAME', '名称')" width="180" />
-      <el-table-column prop="sortIndex" :label="$t('G2_LBL_SORT', '排序')" width="140" />
+      <el-table-column prop="code" :label="$t('G2_FIELD_CODE', '编码')" width="180" />
+      <el-table-column prop="name" :label="$t('G2_FIELD_NAME', '名称')" width="180" />
+      <el-table-column prop="sortIndex" :label="$t('G2_LBL_SORT', '排序')" width="100" />
       <TableColumn prop="createTime" :label="$t('G2_FIELD_CREATE_TIME', '创建时间')" width="180" :sortable="true" />
       <TableColumn prop="updateTime" :label="$t('G2_FIELD_UPDATE_TIME', '更新时间')" width="180" :sortable="true" />
       <el-table-column :label="$t('G2_FIELD_ACTION', '操作')" fixed="right" width="280">
@@ -82,11 +84,11 @@
             style="width: 100%"
           />
         </el-form-item>
-        <el-form-item :label="$t('INFRA_DICTIONARY_ITEM_FIELD_CODE', '编码')" prop="code">
-          <el-input v-model="editForm.code" :placeholder="$t('INFRA_DICTIONARY_ITEM_PH_CODE', '请输入编码')" />
+        <el-form-item :label="$t('G2_FIELD_CODE', '编码')" prop="code">
+          <el-input v-model="editForm.code" :placeholder="$t('G2_PH_CODE', '请输入编码')" />
         </el-form-item>
-        <el-form-item :label="$t('INFRA_DICTIONARY_ITEM_FIELD_NAME', '名称')" prop="name">
-          <el-input v-model="editForm.name" :placeholder="$t('INFRA_DICTIONARY_ITEM_PH_NAME', '请输入名称')" />
+        <el-form-item :label="$t('G2_FIELD_NAME', '名称')" prop="name">
+          <el-input v-model="editForm.name" :placeholder="$t('G2_PH_NAME', '请输入名称')" />
         </el-form-item>
         <el-form-item :label="$t('G2_LBL_SORT', '排序')" prop="sortIndex">
           <el-input-number
@@ -95,7 +97,7 @@
             :step="1"
             :precision="0"
             controls-position="right"
-            :placeholder="$t('INFRA_DICTIONARY_ITEM_PH_SORT', '请输入排序')"
+            :placeholder="$t('G2_PH_SORT', '请输入排序')"
             style="width: 100%"
           />
         </el-form-item>
@@ -115,8 +117,8 @@
       <el-descriptions :column="1" border>
         <el-descriptions-item :label="$t('INFRA_DICTIONARY_ITEM_COL_ID', '当前节点')">{{ currentRow?.id }}</el-descriptions-item>
         <el-descriptions-item :label="$t('INFRA_DICTIONARY_ITEM_FIELD_PARENT', '上级节点')">{{ currentRow?.parentName }}</el-descriptions-item>
-        <el-descriptions-item :label="$t('INFRA_DICTIONARY_ITEM_FIELD_CODE', '编码')">{{ currentRow?.code }}</el-descriptions-item>
-        <el-descriptions-item :label="$t('INFRA_DICTIONARY_ITEM_FIELD_NAME', '名称')">{{ currentRow?.name }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('G2_FIELD_CODE', '编码')">{{ currentRow?.code }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('G2_FIELD_NAME', '名称')">{{ currentRow?.name }}</el-descriptions-item>
         <el-descriptions-item :label="$t('G2_LBL_SORT', '排序')">{{ currentRow?.sortIndex }}</el-descriptions-item>
         <el-descriptions-item :label="$t('G2_FIELD_DESC', '描述')">{{ currentRow?.description }}</el-descriptions-item>
         <el-descriptions-item :label="$t('G2_FIELD_CREATE_TIME', '创建时间')">{{ currentRow?.createTime }}</el-descriptions-item>
@@ -139,22 +141,17 @@ import { t } from '@platform/i18n';
 import { DictionaryItemApi } from '@/views/dictionary_usage/dictionary_item/api';
 import type { DictionaryItem, DictionaryItemPayload, DictionaryItemQuery, DictionaryItemTree} from '@/views/dictionary_usage/dictionary_item/type';
 import type { PageSelectListDto } from '@platform/types/api.type';
-import type { QueryFormData } from '@/components/QueryForm';
-import { SortableTable, TableColumn, SortManagerButton, QueryForm, showErrorMessage } from '@/components';
+import { SortableTable, TableColumn, SortManagerButton, QueryForm, type QueryFormData } from '@g2rain/ui';
 
 const props = defineProps<{
   dictionaryUsageCode: string;
 }>();
 
-const panelTitle = computed(() =>
-  t('INFRA_DICTIONARY_ITEM_TITLE', `字典项（字典用途：${props.dictionaryUsageCode}）`),
-);
-
 // 组件引用
 const queryFormRef = ref<InstanceType<typeof QueryForm> | null>(null);
 
 // 基础查询表单（与 QueryForm 的 QueryFormData 对齐）
-let baseQueryForm = reactive<QueryFormData>({
+const baseQueryForm = ref<QueryFormData>({
   id: undefined,
   createTime: undefined,
   updateTime: undefined,
@@ -181,7 +178,7 @@ const loadData = async () => {
   try {
     // 合并基础查询 + 业务查询，并过滤空值
     const query = Object.fromEntries(
-      Object.entries({ ...baseQueryForm, ...queryForm, usageCode: props.dictionaryUsageCode})
+      Object.entries({ ...baseQueryForm.value, ...queryForm, usageCode: props.dictionaryUsageCode})
         .filter(([_, v]) => (v ?? '') !== '' && [v].flat().length)
     ) as DictionaryItemQuery;
 
@@ -195,9 +192,8 @@ const loadData = async () => {
     // 设置响应结果 
     tableData.value = pageData.records;
     pagination.total = pageData.total;
-  } catch (error: unknown) {
-    const msg = error instanceof Error ? error.message : t('G2_MSG_LOAD_FAIL', '加载列表失败');
-    showErrorMessage(msg);
+  } catch {
+    // 请求失败已由 http 层统一提示
   }
 };
 
@@ -247,22 +243,17 @@ const handleView = (row: DictionaryItem) => {
 // 删除数据记录
 const handleDelete = (row: DictionaryItem) => {
   ElMessageBox.confirm(
-    t('INFRA_DICTIONARY_ITEM_DEL_CONFIRM', `确认删除字典项「${row.id}」吗？`),
+    t('INFRA_DICTIONARY_ITEM_DEL_CONFIRM', { id: row.id }, '确认删除字典项「{id}」吗？'),
     t('G2_LBL_TIP', '提示'),
     { type: 'warning' },
   )
     .then(async () => {
-      try {
-        await DictionaryItemApi.remove(row.id);
-        if (tableData.value.length === 1 && pagination.pageNum > 1) {
-          pagination.pageNum--;
-        }
-        await loadData();
-        ElMessage.success(t('G2_MSG_DELETE_OK', '删除成功'));
-      } catch (error: unknown) {
-        const msg = error instanceof Error ? error.message : t('G2_MSG_DELETE_FAIL', '删除失败');
-        showErrorMessage(msg);
+      await DictionaryItemApi.remove(row.id);
+      if (tableData.value.length === 1 && pagination.pageNum > 1) {
+        pagination.pageNum--;
       }
+      await loadData();
+      ElMessage.success(t('G2_MSG_DELETE_OK', '删除成功'));
     })
     .catch(() => {});
 };
@@ -292,9 +283,9 @@ const editDialogTitle = computed(() =>
 
 // 表单校验规则 
 const editRules = computed<FormRules>(() => ({
-  code: [{ required: true, message: t('INFRA_DICTIONARY_ITEM_VLD_CODE', '请输入编码'), trigger: 'blur' }],
-  name: [{ required: true, message: t('INFRA_DICTIONARY_ITEM_VLD_NAME', '请输入名称'), trigger: 'blur' }],
-  sortIndex: [{ required: true, message: t('INFRA_DICTIONARY_ITEM_VLD_SORT', '请输入排序'), trigger: 'blur' }],
+  code: [{ required: true, message: t('G2_PH_CODE', '请输入编码'), trigger: 'blur' }],
+  name: [{ required: true, message: t('G2_PH_NAME', '请输入名称'), trigger: 'blur' }],
+  sortIndex: [{ required: true, message: t('G2_PH_SORT', '请输入排序'), trigger: 'blur' }],
 }));
 
 // 打开创建弹窗
@@ -338,18 +329,13 @@ const submitEdit = async () => {
     description: editForm.description,
   };
 
-  try {
-    if (isEdit.value) {
-      payload.id = editForm.id;
-    }
-    await DictionaryItemApi.save(payload);
-    ElMessage.success(isEdit.value ? t('G2_MSG_UPDATE_OK', '更新成功') : t('G2_MSG_ADD_OK', '新增成功'));
-    await loadData();
-    editDialogVisible.value = false;
-  } catch (error: unknown) {
-    const msg = error instanceof Error ? error.message : t('G2_MSG_SAVE_FAIL', '保存失败');
-    showErrorMessage(msg);
+  if (isEdit.value) {
+    payload.id = editForm.id;
   }
+  await DictionaryItemApi.save(payload);
+  ElMessage.success(isEdit.value ? t('G2_MSG_UPDATE_OK', '更新成功') : t('G2_MSG_ADD_OK', '新增成功'));
+  await loadData();
+  editDialogVisible.value = false;
 };
 
 const parentTreeData = ref<DictionaryItemTree[]>([]);
@@ -406,9 +392,7 @@ async function refreshParentTree() {
       merged = filterTreeExcludingSelf(merged, editForm.id);
     }
     parentTreeData.value = merged;
-  } catch (error: unknown) {
-    const msg = error instanceof Error ? error.message : t('INFRA_DICTIONARY_ITEM_MSG_TREE_FAIL', '加载父级树失败');
-    showErrorMessage(msg);
+  } catch {
     parentTreeData.value = [createTopLevelTreeOption(props.dictionaryUsageCode)];
   } finally {
     parentTreeLoading.value = false;
@@ -416,10 +400,9 @@ async function refreshParentTree() {
 }
 
 function resetQueryFields() {
-  baseQueryForm.id = undefined;
-  baseQueryForm.createTime = undefined;
-  baseQueryForm.updateTime = undefined;
-  baseQueryForm.sorts = undefined;
+  baseQueryForm.value.id = undefined;
+  baseQueryForm.value.createTime = undefined;
+  baseQueryForm.value.updateTime = undefined;
   queryForm.parentId = undefined as number | undefined;
   queryForm.code = '';
   queryForm.name = '';
@@ -453,7 +436,7 @@ watch(editDialogVisible, (open) => {
 
 .dictionary-item-panel__search {
   margin-bottom: 12px;
-  background-color: #fff;
+  background-color: var(--g2-bg-container);
 }
 
 .dictionary-item-panel__header {
@@ -462,7 +445,7 @@ watch(editDialogVisible, (open) => {
   justify-content: space-between;
   margin-bottom: 12px;
   padding: 12px 16px;
-  background-color: #fff;
+  background-color: var(--g2-bg-container);
   border-radius: 4px;
 }
 

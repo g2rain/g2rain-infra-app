@@ -5,13 +5,13 @@
       <!-- 基础查询表单（BaseSelectListDto） -->
       <QueryForm ref="queryFormRef" v-model="baseQueryForm" @search="handleSearch">
         <!-- 业务特定查询字段 -->
-        <el-form-item :label="$t('INFRA_LOCALE_SETTING_FIELD_CODE', '编码')">
+        <el-form-item :label="$t('G2_FIELD_CODE', '编码')">
           <el-select v-model="queryForm.code" :placeholder="$t('INFRA_LOCALE_SETTING_PH_CODE', '请选择编码')" clearable filterable style="width: 200px">
             <el-option v-for="item in localeOptions" :key="item.value" :label="item.label" :value="item.value" />
           </el-select>
         </el-form-item>
-        <el-form-item :label="$t('INFRA_LOCALE_SETTING_FIELD_NAME', '名称')">
-          <el-input v-model="queryForm.name" :placeholder="$t('INFRA_LOCALE_SETTING_PH_NAME', '请输入名称')" clearable style="width: 200px" />
+        <el-form-item :label="$t('G2_FIELD_NAME', '名称')">
+          <el-input v-model="queryForm.name" :placeholder="$t('G2_PH_NAME', '请输入名称')" clearable style="width: 200px" />
         </el-form-item>
         <!-- 操作按钮 -->
         <template #actions>
@@ -26,7 +26,7 @@
     <!-- 标题和操作按钮 -->
     <div class="locale_setting-page__header">
       <div class="locale_setting-page__title-group">
-        <h2>{{ $t('INFRA_LOCALE_SETTING_TITLE', '管理地区语言数据') }}</h2>
+        <h2>{{ $t('INFRA_LOCALE_SETTING_TITLE', '地区语言') }}</h2>
       </div>
       <el-button type="primary" v-permission="'locale_setting:add'" @click="handleCreate">
         {{ $t('INFRA_LOCALE_SETTING_BTN_ADD', '新增地区语言') }}
@@ -34,11 +34,10 @@
     </div>
 
     <SortableTable :data="tableData" border stripe style="width: 100%" :enable-multi-sort="true" @sort-change="handleSortChange">
-      <el-table-column prop="id" :label="$t('INFRA_LOCALE_SETTING_COL_ID', '地区语言标识')" width="120" />
-      <el-table-column prop="code" :label="$t('INFRA_LOCALE_SETTING_FIELD_CODE', '编码')" width="180" />
-      <el-table-column prop="name" :label="$t('INFRA_LOCALE_SETTING_FIELD_NAME', '名称')" width="180" />
+      <el-table-column prop="id" :label="$t('INFRA_LOCALE_SETTING_COL_ID', '地区语言标识')" width="130" />
+      <el-table-column prop="code" :label="$t('G2_FIELD_CODE', '编码')" width="180" />
+      <el-table-column prop="name" :label="$t('G2_FIELD_NAME', '名称')" width="180" />
       <el-table-column prop="sortIndex" :label="$t('G2_LBL_SORT', '排序')" width="140" />
-      <el-table-column prop="description" :label="$t('INFRA_LOCALE_SETTING_FIELD_DESC', '描述')" width="180" />
       <TableColumn prop="createTime" :label="$t('G2_FIELD_CREATE_TIME', '创建时间')" width="180" :sortable="true" />
       <TableColumn prop="updateTime" :label="$t('G2_FIELD_UPDATE_TIME', '更新时间')" width="180" :sortable="true" />
       <el-table-column :label="$t('G2_FIELD_ACTION', '操作')" fixed="right" width="280">
@@ -72,13 +71,13 @@
     <!-- 新增 / 编辑弹窗 -->
     <el-dialog v-model="editDialogVisible" :title="editDialogTitle" width="520px">
       <el-form ref="editFormRef" :model="editForm" :rules="editRules" label-width="120px">
-        <el-form-item :label="$t('INFRA_LOCALE_SETTING_FIELD_CODE', '编码')" prop="code">
+        <el-form-item :label="$t('G2_FIELD_CODE', '编码')" prop="code">
           <el-select v-model="editForm.code" :disabled="isEdit" :placeholder="$t('INFRA_LOCALE_SETTING_PH_CODE', '请选择编码')" filterable style="width: 200px">
             <el-option v-for="item in localeOptions" :key="item.value" :label="item.label" :value="item.value" />
           </el-select>
         </el-form-item>
-        <el-form-item :label="$t('INFRA_LOCALE_SETTING_FIELD_NAME', '名称')" prop="name">
-          <el-input v-model="editForm.name" :placeholder="$t('INFRA_LOCALE_SETTING_PH_NAME', '请输入名称')" />
+        <el-form-item :label="$t('G2_FIELD_NAME', '名称')" prop="name">
+          <el-input v-model="editForm.name" :placeholder="$t('G2_PH_NAME', '请输入名称')" />
         </el-form-item>
         <el-form-item :label="$t('G2_LBL_SORT', '排序')" prop="sortIndex">
           <el-input-number
@@ -87,12 +86,12 @@
             :step="1"
             :precision="0"
             controls-position="right"
-            :placeholder="$t('INFRA_LOCALE_SETTING_PH_SORT', '请输入排序')"
+            :placeholder="$t('G2_PH_SORT', '请输入排序')"
             style="width: 100%"
           />
         </el-form-item>
-        <el-form-item :label="$t('INFRA_LOCALE_SETTING_FIELD_DESC', '描述')" prop="description">
-          <el-input v-model="editForm.description" :placeholder="$t('INFRA_LOCALE_SETTING_PH_DESC', '请输入描述')" />
+        <el-form-item :label="$t('G2_FIELD_DESC', '描述')" prop="description">
+          <el-input v-model="editForm.description" :placeholder="$t('G2_PH_DESC', '请输入描述')" />
         </el-form-item>
       </el-form>
       <template #footer>
@@ -106,14 +105,14 @@
     <!-- 明细弹窗 -->
     <el-dialog v-model="detailDialogVisible" :title="$t('INFRA_LOCALE_SETTING_DETAIL', '地区语言明细')" width="520px">
       <el-descriptions :column="1" border>
-        <el-descriptions-item :label="$t('INFRA_LOCALE_SETTING_FIELD_CODE', '编码')">
+        <el-descriptions-item :label="$t('G2_FIELD_CODE', '编码')">
           <el-tag>
             {{localeOptions.find(item => item.value === currentRow?.code)?.label || ''}}
           </el-tag>
         </el-descriptions-item>
-        <el-descriptions-item :label="$t('INFRA_LOCALE_SETTING_FIELD_NAME', '名称')">{{ currentRow?.name }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('G2_FIELD_NAME', '名称')">{{ currentRow?.name }}</el-descriptions-item>
         <el-descriptions-item :label="$t('G2_LBL_SORT', '排序')">{{ currentRow?.sortIndex }}</el-descriptions-item>
-        <el-descriptions-item :label="$t('INFRA_LOCALE_SETTING_FIELD_DESC', '描述')">{{ currentRow?.description }}</el-descriptions-item>
+        <el-descriptions-item :label="$t('G2_FIELD_DESC', '描述')">{{ currentRow?.description }}</el-descriptions-item>
         <el-descriptions-item :label="$t('G2_FIELD_CREATE_TIME', '创建时间')">{{ currentRow?.createTime }}</el-descriptions-item>
         <el-descriptions-item :label="$t('G2_FIELD_UPDATE_TIME', '更新时间')">{{ currentRow?.updateTime }}</el-descriptions-item>
       </el-descriptions>
@@ -135,7 +134,7 @@ import { LocaleSettingApi } from './api';
 import type { LocaleSetting, LocaleSettingPayload, LocaleSettingQuery } from './type';
 import type { BaseSelectListDto, PageSelectListDto } from '@platform/types/api.type';
 
-import { SortableTable, TableColumn, SortManagerButton, QueryForm, showErrorMessage } from '@/components';
+import { SortableTable, TableColumn, SortManagerButton, QueryForm } from '@g2rain/ui';
 
 // 定义字典引用
 const localeOptions = ref<Array<{ label: string; value: string }>>([]);
@@ -154,7 +153,7 @@ const loadDicts = async () => {
 const queryFormRef = ref<InstanceType<typeof QueryForm> | null>(null);
 
 // 基础查询表单（BaseSelectListDto）
-let baseQueryForm = reactive<BaseSelectListDto>({
+const baseQueryForm = ref<BaseSelectListDto>({
   id: undefined,
   createTime: undefined,
   updateTime: undefined,
@@ -180,7 +179,7 @@ const loadData = async () => {
   try {
     // 合并基础查询 + 业务查询，并过滤空值
     const query = Object.fromEntries(
-      Object.entries({ ...baseQueryForm, ...queryForm })
+      Object.entries({ ...baseQueryForm.value, ...queryForm })
         .filter(([_, v]) => (v ?? '') !== '' && [v].flat().length)
     ) as LocaleSettingQuery;
 
@@ -194,8 +193,8 @@ const loadData = async () => {
     // 设置响应结果    
     tableData.value = pageData.records;
     pagination.total = pageData.total;
-  } catch (error: unknown) {
-    showErrorMessage(error instanceof Error ? error : t('G2_MSG_LOAD_FAIL', '加载列表失败'));
+  } catch {
+    // 请求失败已由 http 层统一提示
   }
 };
 
@@ -214,10 +213,9 @@ const handleSearch = () => {
 // 重置查询条件
 const handleReset = () => {
   // 重置基础查询表单
-  baseQueryForm.id = undefined;
-  baseQueryForm.createTime = undefined;
-  baseQueryForm.updateTime = undefined;
-  baseQueryForm.sorts = undefined;
+  baseQueryForm.value.id = undefined;
+  baseQueryForm.value.createTime = undefined;
+  baseQueryForm.value.updateTime = undefined;
   
   // 重置业务特定查询表单
   queryForm.code = '';
@@ -253,22 +251,18 @@ const handleView = (row: LocaleSetting) => {
 // 删除数据记录
 const handleDelete = (row: LocaleSetting) => {
   ElMessageBox.confirm(
-    t('INFRA_LOCALE_SETTING_DEL_CONFIRM', `确认删除地区语言「${row.id}」吗？`),
+    t('INFRA_LOCALE_SETTING_DEL_CONFIRM', { id: row.id }, '确认删除地区语言「{id}」吗？'),
     t('G2_LBL_TIP', '提示'),
     { type: 'warning' },
   )
     .then(async () => {
-      try {
-        await LocaleSettingApi.remove(row.id);
-        // 如果当前页只有一条数据，删除后应该跳转到上一页
-        if (tableData.value.length === 1 && pagination.pageNum > 1) {
-          pagination.pageNum--;
-        }
-        await loadData();
-        ElMessage.success(t('G2_MSG_DELETE_OK', '删除成功'));
-      } catch (error: unknown) {
-        showErrorMessage(error instanceof Error ? error : t('G2_MSG_DELETE_FAIL', '删除失败'));
+      await LocaleSettingApi.remove(row.id);
+      // 如果当前页只有一条数据，删除后应该跳转到上一页
+      if (tableData.value.length === 1 && pagination.pageNum > 1) {
+        pagination.pageNum--;
       }
+      await loadData();
+      ElMessage.success(t('G2_MSG_DELETE_OK', '删除成功'));
     })
     .catch(() => {});
 };
@@ -297,9 +291,9 @@ const editDialogTitle = computed(() =>
 
 // 表单校验规则
 const editRules = computed<FormRules>(() => ({
-  code: [{ required: true, message: t('INFRA_LOCALE_SETTING_VLD_CODE', '请输入编码'), trigger: 'blur' }],
-  name: [{ required: true, message: t('INFRA_LOCALE_SETTING_VLD_NAME', '请输入名称'), trigger: 'blur' }],
-  sortIndex: [{ required: true, message: t('INFRA_LOCALE_SETTING_VLD_SORT', '请输入排序'), trigger: 'blur' }],
+  code: [{ required: true, message: t('G2_PH_CODE', '请输入编码'), trigger: 'blur' }],
+  name: [{ required: true, message: t('G2_PH_NAME', '请输入名称'), trigger: 'blur' }],
+  sortIndex: [{ required: true, message: t('G2_PH_SORT', '请输入排序'), trigger: 'blur' }],
 }));
 
 // 打开创建弹窗
@@ -340,18 +334,14 @@ const submitEdit = async () => {
     description: editForm.description,
   };
 
-  try {
-    // 编辑模式下，将 id 添加到 payload 中
-    if (isEdit.value) {
-      payload.id = editForm.id;
-    }
-    await LocaleSettingApi.save(payload);
-    ElMessage.success(isEdit.value ? t('G2_MSG_UPDATE_OK', '更新成功') : t('G2_MSG_ADD_OK', '新增成功'));
-    await loadData();
-    editDialogVisible.value = false;
-  } catch (error: unknown) {
-    showErrorMessage(error instanceof Error ? error : t('G2_MSG_SAVE_FAIL', '保存失败'));
+  // 编辑模式下，将 id 添加到 payload 中
+  if (isEdit.value) {
+    payload.id = editForm.id;
   }
+  await LocaleSettingApi.save(payload);
+  ElMessage.success(isEdit.value ? t('G2_MSG_UPDATE_OK', '更新成功') : t('G2_MSG_ADD_OK', '新增成功'));
+  await loadData();
+  editDialogVisible.value = false;
 };
 
 // 挂载回调
@@ -366,7 +356,7 @@ onMounted(async() => {
 <style scoped>
 .locale_setting-page {
   padding: 20px;
-  background-color: #f5f7fa;
+  background-color: var(--g2-bg-page);
   min-height: 100%;
   height: 100%;
   box-sizing: border-box;
@@ -379,7 +369,7 @@ onMounted(async() => {
   margin-bottom: 12px;
   margin-top: 0;
   padding: 16px 20px;
-  background-color: #fff;
+  background-color: var(--g2-bg-container);
   border-radius: 4px;
 }
 
@@ -404,7 +394,7 @@ onMounted(async() => {
 
 .locale_setting-page__search {
   margin-bottom: 12px;
-  background-color: #fff;
+  background-color: var(--g2-bg-container);
 }
 
 .locale_setting-page__pagination {

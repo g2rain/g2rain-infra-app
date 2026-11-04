@@ -41,9 +41,9 @@
             <el-option v-for="item in queryRegionSelectOptions" :key="item.value" :label="item.label" :value="item.value" />
           </el-select>
         </el-form-item>
-        <el-form-item v-if="queryForm.messageUsageCode === MESSAGE_USAGE_UI_MESSAGE" :label="$t('INFRA_I18N_MESSAGE_FIELD_TAG', '标签')">
-          <el-select v-model="queryForm.tag" :placeholder="$t('INFRA_I18N_MESSAGE_PH_TAG', '请选择标签')" clearable filterable style="width: 200px">
-            <el-option v-for="item in tagOptions" :key="item.value" :label="item.label" :value="item.value" />
+        <el-form-item v-if="usageNeedsTag(queryForm.messageUsageCode)" :label="$t('G2_FIELD_TAG', '标签')">
+          <el-select v-model="queryForm.tag" :placeholder="queryTagPlaceholder" clearable filterable style="width: 200px">
+            <el-option v-for="item in queryTagSelectOptions" :key="item.value" :label="item.label" :value="item.value" />
           </el-select>
         </el-form-item>
         <el-form-item :label="$t('INFRA_I18N_MESSAGE_FIELD_MESSAGE_CODE', '消息编码')">
@@ -62,7 +62,7 @@
     <!-- 标题和操作按钮 -->
     <div class="i18n_message-page__header">
       <div class="i18n_message-page__title-group">
-        <h2>{{ $t('INFRA_I18N_MESSAGE_TITLE', '管理国际化信息数据') }}</h2>
+        <h2>{{ $t('INFRA_I18N_MESSAGE_TITLE', '国际化信息') }}</h2>
       </div>
       <el-button type="primary" v-permission="'i18n_message:add'" @click="handleCreate">
         {{ $t('INFRA_I18N_MESSAGE_BTN_ADD', '新增国际化信息') }}
@@ -71,7 +71,7 @@
 
     <SortableTable :data="tableData" border stripe style="width: 100%" :enable-multi-sort="true" @sort-change="handleSortChange">
       <el-table-column prop="id" :label="$t('G2_FIELD_ID', 'ID')" width="120" />
-      <el-table-column prop="messageUsageName" :label="$t('INFRA_I18N_MESSAGE_COL_USAGE', '国际化信息用途')" width="160">
+      <el-table-column prop="messageUsageName" :label="$t('INFRA_I18N_MESSAGE_COL_USAGE', '国际化信息用途')" width="180">
         <template #default="{ row }">
           <el-tag>
             {{usageOptions.find(item => item.value === row?.messageUsageCode)?.label || ''}}
@@ -80,8 +80,8 @@
       </el-table-column>
       <el-table-column prop="languageCode" :label="$t('INFRA_I18N_MESSAGE_FIELD_LANGUAGE_CODE', '语言代码')" width="180" />
       <el-table-column prop="regionCode" :label="$t('INFRA_I18N_MESSAGE_FIELD_REGION_CODE', '区域代码')" width="180" />
-      <el-table-column prop="tag" :label="$t('INFRA_I18N_MESSAGE_FIELD_TAG', '标签')" width="160" />
-      <el-table-column prop="messageCode" :label="$t('INFRA_I18N_MESSAGE_FIELD_MESSAGE_CODE', '消息编码')" width="180" />
+      <el-table-column prop="tag" :label="$t('G2_FIELD_TAG', '标签')" width="120" />
+      <el-table-column prop="messageCode" :label="$t('INFRA_I18N_MESSAGE_FIELD_MESSAGE_CODE', '消息编码')" width="380" />
       <TableColumn prop="createTime" :label="$t('G2_FIELD_CREATE_TIME', '创建时间')" width="180" :sortable="true" />
       <TableColumn prop="updateTime" :label="$t('G2_FIELD_UPDATE_TIME', '更新时间')" width="180" :sortable="true" />
       <el-table-column :label="$t('G2_FIELD_ACTION', '操作')" fixed="right" width="280">
@@ -114,7 +114,7 @@
 
     <!-- 新增 / 编辑弹窗 -->
     <el-dialog v-model="editDialogVisible" :title="editDialogTitle" width="520px">
-      <el-form ref="editFormRef" :model="editForm" :rules="editRules" label-width="130px">
+      <el-form ref="editFormRef" :model="editForm" :rules="editRules" label-width="180px">
         <el-form-item :label="$t('INFRA_I18N_MESSAGE_COL_USAGE', '国际化信息用途')" prop="messageUsageCode">
           <el-select
             v-model="editForm.messageUsageCode"
@@ -127,10 +127,10 @@
             <el-option v-for="item in usageOptions" :key="item.value" :label="item.label" :value="item.value" />
           </el-select>
         </el-form-item>
-        <el-form-item v-if="showEditTagField" :label="$t('INFRA_I18N_MESSAGE_FIELD_TAG', '标签')" prop="tag">
+        <el-form-item v-if="showEditTagField" :label="$t('G2_FIELD_TAG', '标签')" prop="tag">
           <el-select
             v-model="editForm.tag"
-            :placeholder="$t('INFRA_I18N_MESSAGE_PH_TAG_INPUT', '请选择或输入标签')"
+            :placeholder="editTagPlaceholder"
             clearable
             filterable
             allow-create
@@ -192,7 +192,7 @@
         </el-descriptions-item>
         <el-descriptions-item :label="$t('INFRA_I18N_MESSAGE_FIELD_LANGUAGE_CODE', '语言代码')">{{ currentRow?.languageCode }}</el-descriptions-item>
         <el-descriptions-item :label="$t('INFRA_I18N_MESSAGE_FIELD_REGION_CODE', '区域代码')">{{ currentRow?.regionCode }}</el-descriptions-item>
-        <el-descriptions-item v-if="currentRow?.messageUsageCode === MESSAGE_USAGE_UI_MESSAGE" :label="$t('INFRA_I18N_MESSAGE_FIELD_TAG', '标签')">
+        <el-descriptions-item v-if="usageNeedsTag(currentRow?.messageUsageCode)" :label="$t('G2_FIELD_TAG', '标签')">
           {{ currentRow?.tag }}
         </el-descriptions-item>
         <el-descriptions-item :label="$t('INFRA_I18N_MESSAGE_FIELD_MESSAGE_CODE', '消息编码')">{{ currentRow?.messageCode }}</el-descriptions-item>
@@ -217,19 +217,24 @@ import { ElMessage, ElMessageBox } from 'element-plus';
 import { t } from '@platform/i18n';
 import { I18nMessageApi } from './api';
 import { LocaleSettingApi, type LanguageCountriesMap } from '../locale_setting/api';
+import { DictionaryUsageApi } from '../dictionary_usage/api';
 import type { I18nMessage, I18nMessagePayload, I18nMessageQuery } from './type';
 import type { BaseSelectListDto, PageSelectListDto } from '@platform/types/api.type';
 
-import { SortableTable, TableColumn, SortManagerButton, QueryForm, showErrorMessage } from '@/components';
+import { SortableTable, TableColumn, SortManagerButton, QueryForm } from '@g2rain/ui';
 import { storeToRefs } from 'pinia';
 import { useLocaleStore } from '@platform/stores/locale.store';
 
-/** UI 文案类国际化用途编码 */
+/** 需要填写标签的国际化用途 */
 const MESSAGE_USAGE_UI_MESSAGE = 'UI_MESSAGE';
+const MESSAGE_USAGE_DICTIONARY = 'DICTIONARY';
+const usageNeedsTag = (code?: string | null) =>
+  code === MESSAGE_USAGE_UI_MESSAGE || code === MESSAGE_USAGE_DICTIONARY;
 
 // 定义字典引用
 const usageOptions = ref<Array<{ label: string; value: string }>>([]);
 const tagOptions = ref<Array<{ label: string; value: string }>>([]);
+const dictionaryUsageOptions = ref<Array<{ label: string; value: string }>>([]);
 
 /** 语言 → 区域代码列表（来自 get_language_countries） */
 const languageCountryMap = ref<LanguageCountriesMap>({});
@@ -267,11 +272,28 @@ const editRegionSelectOptions = computed(() => {
   return opts;
 });
 
-const showEditTagField = computed(() => editForm.messageUsageCode === MESSAGE_USAGE_UI_MESSAGE);
+const showEditTagField = computed(() => usageNeedsTag(editForm.messageUsageCode));
 
-/** 编辑弹窗：若已有 tag 不在字典中，仍展示为可选项 */
+const tagOptionsForUsage = (usageCode: string) =>
+  usageCode === MESSAGE_USAGE_DICTIONARY ? dictionaryUsageOptions.value : tagOptions.value;
+
+const queryTagSelectOptions = computed(() => tagOptionsForUsage(queryForm.messageUsageCode));
+
+const queryTagPlaceholder = computed(() =>
+  queryForm.messageUsageCode === MESSAGE_USAGE_DICTIONARY
+    ? t('INFRA_I18N_MESSAGE_PH_TAG_DICT', '请选择字典用途编码')
+    : t('INFRA_I18N_MESSAGE_PH_TAG', '请选择标签'),
+);
+
+const editTagPlaceholder = computed(() =>
+  editForm.messageUsageCode === MESSAGE_USAGE_DICTIONARY
+    ? t('INFRA_I18N_MESSAGE_PH_TAG_INPUT_DICT', '请选择或填写字典用途编码')
+    : t('INFRA_I18N_MESSAGE_PH_TAG_INPUT', '请选择或输入标签'),
+);
+
+/** 编辑弹窗：若已有 tag 不在选项中，仍展示为可选项 */
 const editTagSelectOptions = computed(() => {
-  const base = tagOptions.value;
+  const base = tagOptionsForUsage(editForm.messageUsageCode);
   const tag = editForm.tag;
   if (tag && !base.some(o => o.value === tag)) {
     return [...base, { value: tag, label: tag }];
@@ -294,16 +316,12 @@ const onEditLanguageChange = () => {
 };
 
 const onEditMessageUsageChange = () => {
-  if (editForm.messageUsageCode !== MESSAGE_USAGE_UI_MESSAGE) {
-    editForm.tag = '';
-    editFormRef.value?.clearValidate('tag');
-  }
+  editForm.tag = '';
+  editFormRef.value?.clearValidate('tag');
 };
 
 const onQueryMessageUsageChange = () => {
-  if (queryForm.messageUsageCode !== MESSAGE_USAGE_UI_MESSAGE) {
-    queryForm.tag = '';
-  }
+  queryForm.tag = '';
 };
 
 // 获取字典信息
@@ -321,9 +339,19 @@ const loadDicts = async () => {
   }));
 
   try {
+    const usages = await DictionaryUsageApi.list();
+    dictionaryUsageOptions.value = usages.map(u => ({
+      value: u.usageCode,
+      label: u.usageName ? `${u.usageCode}（${u.usageName}）` : u.usageCode,
+    }));
+  } catch {
+    // 请求失败已由 http 层统一提示
+  }
+
+  try {
     languageCountryMap.value = await LocaleSettingApi.getLanguageCountries();
-  } catch (error: unknown) {
-    showErrorMessage(error instanceof Error ? error : t('INFRA_I18N_MESSAGE_MSG_LANG_COUNTRY_FAIL', '加载语言国家数据失败'));
+  } catch {
+    // 请求失败已由 http 层统一提示
   }
 };
 
@@ -331,7 +359,7 @@ const loadDicts = async () => {
 const queryFormRef = ref<InstanceType<typeof QueryForm> | null>(null);
 
 // 基础查询表单（BaseSelectListDto）
-let baseQueryForm = reactive<BaseSelectListDto>({
+const baseQueryForm = ref<BaseSelectListDto>({
   id: undefined,
   createTime: undefined,
   updateTime: undefined,
@@ -360,7 +388,7 @@ const loadData = async () => {
   try {
     // 合并基础查询 + 业务查询，并过滤空值
     const query = Object.fromEntries(
-      Object.entries({ ...baseQueryForm, ...queryForm })
+      Object.entries({ ...baseQueryForm.value, ...queryForm })
         .filter(([_, v]) => (v ?? '') !== '' && [v].flat().length)
     ) as I18nMessageQuery;
 
@@ -374,8 +402,8 @@ const loadData = async () => {
     // 设置响应结果 
     tableData.value = pageData.records;
     pagination.total = pageData.total;
-  } catch (error: unknown) {
-    showErrorMessage(error instanceof Error ? error : t('G2_MSG_LOAD_FAIL', '加载列表失败'));
+  } catch {
+    // 请求失败已由 http 层统一提示
   }
 };
 
@@ -394,10 +422,9 @@ const handleSearch = () => {
 // 重置查询条件
 const handleReset = () => {
   // 重置基础查询表单
-  baseQueryForm.id = undefined;
-  baseQueryForm.createTime = undefined;
-  baseQueryForm.updateTime = undefined;
-  baseQueryForm.sorts = undefined;
+  baseQueryForm.value.id = undefined;
+  baseQueryForm.value.createTime = undefined;
+  baseQueryForm.value.updateTime = undefined;
   
   // 重置业务特定查询表单
   queryForm.messageUsageCode = '';
@@ -437,22 +464,18 @@ const handleView = (row: I18nMessage) => {
 // 删除数据记录
 const handleDelete = (row: I18nMessage) => {
   ElMessageBox.confirm(
-    t('INFRA_I18N_MESSAGE_DEL_CONFIRM', `确认删除国际化信息「${row.id}」吗？`),
+    t('INFRA_I18N_MESSAGE_DEL_CONFIRM', { id: row.id }, '确认删除国际化信息「{id}」吗？'),
     t('G2_LBL_TIP', '提示'),
     { type: 'warning' },
   )
     .then(async () => {
-      try {
-        await I18nMessageApi.remove(row.id);
-        // 如果当前页只有一条数据，删除后应该跳转到上一页
-        if (tableData.value.length === 1 && pagination.pageNum > 1) {
-          pagination.pageNum--;
-        }
-        await loadData();
-        ElMessage.success(t('G2_MSG_DELETE_OK', '删除成功'));
-      } catch (error: unknown) {
-        showErrorMessage(error instanceof Error ? error : t('G2_MSG_DELETE_FAIL', '删除失败'));
+      await I18nMessageApi.remove(row.id);
+      // 如果当前页只有一条数据，删除后应该跳转到上一页
+      if (tableData.value.length === 1 && pagination.pageNum > 1) {
+        pagination.pageNum--;
       }
+      await loadData();
+      ElMessage.success(t('G2_MSG_DELETE_OK', '删除成功'));
     })
     .catch(() => {});
 };
@@ -540,25 +563,21 @@ const submitEdit = async () => {
     messageCode: editForm.messageCode,
     messageText: editForm.messageText,
     extendField: editForm.extendField,
-    tag: editForm.messageUsageCode === MESSAGE_USAGE_UI_MESSAGE ? editForm.tag : undefined,
+    tag: usageNeedsTag(editForm.messageUsageCode) ? editForm.tag : undefined,
   };
 
-  try {
-    // 编辑模式下，将 id 添加到 payload 中
-    if (isEdit.value) {
-      payload.id = editForm.id;
-    }
-    await I18nMessageApi.save(payload);
-
-    if (!isEdit.value && editForm.messageUsageCode === MESSAGE_USAGE_UI_MESSAGE) {
-      await loadDicts();
-    }
-    ElMessage.success(isEdit.value ? t('G2_MSG_UPDATE_OK', '更新成功') : t('G2_MSG_ADD_OK', '新增成功'));
-    await loadData();
-    editDialogVisible.value = false;
-  } catch (error: unknown) {
-    showErrorMessage(error instanceof Error ? error : t('G2_MSG_SAVE_FAIL', '保存失败'));
+  // 编辑模式下，将 id 添加到 payload 中
+  if (isEdit.value) {
+    payload.id = editForm.id;
   }
+  await I18nMessageApi.save(payload);
+
+  if (!isEdit.value && usageNeedsTag(editForm.messageUsageCode)) {
+    await loadDicts();
+  }
+  ElMessage.success(isEdit.value ? t('G2_MSG_UPDATE_OK', '更新成功') : t('G2_MSG_ADD_OK', '新增成功'));
+  await loadData();
+  editDialogVisible.value = false;
 };
 
 const { locale: userLocale } = storeToRefs(useLocaleStore());
@@ -578,7 +597,7 @@ onMounted(async() => {
 <style scoped>
 .i18n_message-page {
   padding: 20px;
-  background-color: #f5f7fa;
+  background-color: var(--g2-bg-page);
   min-height: 100%;
   height: 100%;
   box-sizing: border-box;
@@ -591,7 +610,7 @@ onMounted(async() => {
   margin-bottom: 12px;
   margin-top: 0;
   padding: 16px 20px;
-  background-color: #fff;
+  background-color: var(--g2-bg-container);
   border-radius: 4px;
 }
 
@@ -616,7 +635,7 @@ onMounted(async() => {
 
 .i18n_message-page__search {
   margin-bottom: 12px;
-  background-color: #fff;
+  background-color: var(--g2-bg-container);
 }
 
 .i18n_message-page__pagination {

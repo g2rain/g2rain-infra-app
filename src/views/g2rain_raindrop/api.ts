@@ -3,7 +3,7 @@
  * 提供g2rain_raindrop数据的 CRUD 操作接口
  */
 
-import { getHttpClient } from '@/components/http';
+import { getHttpClient } from '@runtime/http';
 import type { G2rainRaindrop, G2rainRaindropPayload, G2rainRaindropQuery } from './type';
 import type { PageData, PageSelectListDto } from '@platform/types/api.type';
 

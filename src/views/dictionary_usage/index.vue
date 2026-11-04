@@ -24,19 +24,18 @@
     <!-- 标题和操作按钮 -->
     <div class="dictionary_usage-page__header">
       <div class="dictionary_usage-page__title-group">
-        <h2>{{ $t('INFRA_DICTIONARY_USAGE_TITLE', '管理字典用途数据') }}</h2>
+        <h2>{{ $t('INFRA_DICTIONARY_USAGE_TITLE', '字典用途') }}</h2>
       </div>
       <el-button type="primary" v-permission="'dictionary_usage:add'" @click="handleCreate">{{ $t('INFRA_DICTIONARY_USAGE_BTN_ADD', '新增字典用途') }}</el-button>
     </div>
 
     <SortableTable :data="tableData" border stripe style="width: 100%" :enable-multi-sort="true" @sort-change="handleSortChange">
-      <el-table-column prop="id" :label="$t('INFRA_DICTIONARY_USAGE_COL_ID', '用途标识')" width="210" />
-      <el-table-column prop="usageCode" :label="$t('INFRA_DICTIONARY_USAGE_FIELD_CODE', '用途编码')" width="210" />
-      <el-table-column prop="usageName" :label="$t('INFRA_DICTIONARY_USAGE_FIELD_NAME', '用途名称')" width="210" />
-      <el-table-column prop="description" :label="$t('G2_FIELD_DESC', '描述')" width="280" />
+      <el-table-column prop="id" :label="$t('INFRA_DICTIONARY_USAGE_COL_ID', '用途标识')" width="132" />
+      <el-table-column prop="usageCode" :label="$t('INFRA_DICTIONARY_USAGE_FIELD_CODE', '用途编码')" width="280" />
+      <el-table-column prop="usageName" :label="$t('INFRA_DICTIONARY_USAGE_FIELD_NAME', '用途名称')" width="280" />
       <TableColumn prop="createTime" :label="$t('G2_FIELD_CREATE_TIME', '创建时间')" width="180" :sortable="true" />
       <TableColumn prop="updateTime" :label="$t('G2_FIELD_UPDATE_TIME', '更新时间')" width="180" :sortable="true" />
-      <el-table-column :label="$t('G2_FIELD_ACTION', '操作')" fixed="right" width="210">
+      <el-table-column :label="$t('G2_FIELD_ACTION', '操作')" fixed="right" width="280">
         <template #default="{ row }">
           <el-button type="primary" link size="small" @click="handleView(row)">{{ $t('G2_BTN_DETAIL', '明细') }}</el-button>
           <el-button type="primary" v-permission="'dictionary_usage:items'" link size="small" @click="openDictionaryItems(row)">{{ $t('INFRA_DICTIONARY_USAGE_BTN_ITEMS', '字典项') }}</el-button>
@@ -67,7 +66,7 @@
 
     <!-- 新增 / 编辑弹窗 -->
     <el-dialog v-model="editDialogVisible" :title="editDialogTitle" width="520px">
-      <el-form ref="editFormRef" :model="editForm" :rules="editRules" label-width="100px">
+      <el-form ref="editFormRef" :model="editForm" :rules="editRules" label-width="140px">
         <el-form-item :label="$t('INFRA_DICTIONARY_USAGE_FIELD_CODE', '用途编码')" prop="usageCode">
           <el-input v-model="editForm.usageCode" :placeholder="$t('INFRA_DICTIONARY_USAGE_PH_CODE', '请输入用途编码')" />
         </el-form-item>
@@ -103,8 +102,17 @@
       </template>
     </el-dialog>
 
-    <el-drawer v-model="itemDrawerVisible" :title="itemDrawerTitle" direction="rtl" size="90%" destroy-on-close class="dictionary_usage-item-drawer">
-      <DictionaryItemPanel v-if="itemDrawerUsageCode != ''" :dictionary-usage-code="itemDrawerUsageCode" />
+    <el-drawer v-model="itemDrawerVisible" direction="rtl" size="90%" destroy-on-close class="dictionary_usage-item-drawer">
+      <template #header>
+        <span class="dictionary_usage-item-drawer__title">
+          {{ $t('INFRA_DICTIONARY_USAGE_LBL_ITEMS', '字典项') }} — {{ itemDrawerLabel }}
+        </span>
+      </template>
+      <DictionaryItemPanel
+        v-if="itemDrawerUsageCode !== ''"
+        :key="itemDrawerUsageCode"
+        :dictionary-usage-code="itemDrawerUsageCode"
+      />
     </el-drawer>
   </div>
 </template>
@@ -117,16 +125,15 @@ import { t } from '@platform/i18n';
 import { DictionaryUsageApi } from './api';
 import type { DictionaryUsage, DictionaryUsagePayload, DictionaryUsageQuery } from './type';
 import type { PageSelectListDto } from '@platform/types/api.type';
-import type { QueryFormData } from '@/components/QueryForm';
 
-import { SortableTable, TableColumn, SortManagerButton, QueryForm, showErrorMessage } from '@/components';
+import { SortableTable, TableColumn, SortManagerButton, QueryForm, type QueryFormData } from '@g2rain/ui';
 import DictionaryItemPanel from './components/DictionaryItemPanel.vue';
 
 // 组件引用
 const queryFormRef = ref<InstanceType<typeof QueryForm> | null>(null);
 
 // 基础查询表单（与 QueryForm 的 QueryFormData 对齐）
-let baseQueryForm = reactive<QueryFormData>({
+const baseQueryForm = ref<QueryFormData>({
   id: undefined,
   createTime: undefined,
   updateTime: undefined,
@@ -152,7 +159,7 @@ const loadData = async () => {
   try {
     // 合并基础查询 + 业务查询，并过滤空值
     const query = Object.fromEntries(
-      Object.entries({ ...baseQueryForm, ...queryForm })
+      Object.entries({ ...baseQueryForm.value, ...queryForm })
         .filter(([_, v]) => (v ?? '') !== '' && [v].flat().length)
     ) as DictionaryUsageQuery;
 
@@ -166,9 +173,8 @@ const loadData = async () => {
     // 设置响应结果 
     tableData.value = pageData.records;
     pagination.total = pageData.total;
-  } catch (error: unknown) {
-    const msg = error instanceof Error ? error.message : t('G2_MSG_LOAD_FAIL', '加载列表失败');
-    showErrorMessage(msg);
+  } catch {
+    // 请求失败已由 http 层统一提示
   }
 };
 
@@ -187,10 +193,9 @@ const handleSearch = () => {
 // 重置查询条件
 const handleReset = () => {
   // 重置基础查询表单
-  baseQueryForm.id = undefined;
-  baseQueryForm.createTime = undefined;
-  baseQueryForm.updateTime = undefined;
-  baseQueryForm.sorts = undefined;
+  baseQueryForm.value.id = undefined;
+  baseQueryForm.value.createTime = undefined;
+  baseQueryForm.value.updateTime = undefined;
   
   // 重置业务特定查询表单
   queryForm.usageCode = '';
@@ -227,23 +232,18 @@ const handleView = (row: DictionaryUsage) => {
 // 删除数据记录
 const handleDelete = (row: DictionaryUsage) => {
   ElMessageBox.confirm(
-    t('INFRA_DICTIONARY_USAGE_DEL_CONFIRM', `确认删除字典用途「${row.id}」吗？`),
+    t('INFRA_DICTIONARY_USAGE_DEL_CONFIRM', { id: row.id }, '确认删除字典用途「{id}」吗？'),
     t('G2_LBL_TIP', '提示'),
     { type: 'warning' },
   )
     .then(async () => {
-      try {
-        await DictionaryUsageApi.remove(row.id);
-        // 如果当前页只有一条数据，删除后应该跳转到上一页
-        if (tableData.value.length === 1 && pagination.pageNum > 1) {
-          pagination.pageNum--;
-        }
-        await loadData();
-        ElMessage.success(t('G2_MSG_DELETE_OK', '删除成功'));
-      } catch (error: unknown) {
-        const msg = error instanceof Error ? error.message : t('G2_MSG_DELETE_FAIL', '删除失败');
-        showErrorMessage(msg);
+      await DictionaryUsageApi.remove(row.id);
+      // 如果当前页只有一条数据，删除后应该跳转到上一页
+      if (tableData.value.length === 1 && pagination.pageNum > 1) {
+        pagination.pageNum--;
       }
+      await loadData();
+      ElMessage.success(t('G2_MSG_DELETE_OK', '删除成功'));
     })
     .catch(() => {});
 };
@@ -310,34 +310,25 @@ const submitEdit = async () => {
     description: editForm.description,
   };
 
-  try {
-    // 编辑模式下，将 id 添加到 payload 中
-    if (isEdit.value) {
-      payload.id = editForm.id;
-    }
-    await DictionaryUsageApi.save(payload);
-    ElMessage.success(isEdit.value ? t('G2_MSG_UPDATE_OK', '更新成功') : t('G2_MSG_ADD_OK', '新增成功'));
-    await loadData();
-    editDialogVisible.value = false;
-  } catch (error: unknown) {
-    const msg = error instanceof Error ? error.message : t('G2_MSG_SAVE_FAIL', '保存失败');
-    showErrorMessage(msg);
+  // 编辑模式下，将 id 添加到 payload 中
+  if (isEdit.value) {
+    payload.id = editForm.id;
   }
+  await DictionaryUsageApi.save(payload);
+  ElMessage.success(isEdit.value ? t('G2_MSG_UPDATE_OK', '更新成功') : t('G2_MSG_ADD_OK', '新增成功'));
+  await loadData();
+  editDialogVisible.value = false;
 };
 
 const itemDrawerVisible = ref(false);
 const itemDrawerUsageCode = ref('');
 const itemDrawerLabel = ref('');
 
-const itemDrawerTitle = computed(() =>
-  itemDrawerLabel.value
-    ? t('INFRA_DICTIONARY_USAGE_DRAWER_ITEMS', `字典项 — ${itemDrawerLabel.value}`)
-    : t('INFRA_DICTIONARY_USAGE_LBL_ITEMS', '字典项'),
-);
-
 const openDictionaryItems = (row: DictionaryUsage) => {
-  itemDrawerUsageCode.value = row.usageCode;
-  itemDrawerLabel.value = row.usageName || row.usageCode || String(row.id);
+  const usageCode = row.usageCode?.trim() ?? '';
+  const usageName = row.usageName?.trim() ?? '';
+  itemDrawerUsageCode.value = usageCode;
+  itemDrawerLabel.value = usageName || usageCode || String(row.id ?? '');
   itemDrawerVisible.value = true;
 };
 
@@ -351,7 +342,7 @@ onMounted(() => {
 <style scoped>
 .dictionary_usage-page {
   padding: 20px;
-  background-color: #f5f7fa;
+  background-color: var(--g2-bg-page);
   min-height: 100%;
   height: 100%;
   box-sizing: border-box;
@@ -364,7 +355,7 @@ onMounted(() => {
   margin-bottom: 12px;
   margin-top: 0;
   padding: 16px 20px;
-  background-color: #fff;
+  background-color: var(--g2-bg-container);
   border-radius: 4px;
 }
 
@@ -389,12 +380,18 @@ onMounted(() => {
 
 .dictionary_usage-page__search {
   margin-bottom: 12px;
-  background-color: #fff;
+  background-color: var(--g2-bg-container);
 }
 
 .dictionary_usage-page__pagination {
   display: flex;
   justify-content: flex-end;
   margin-top: 16px;
+}
+
+.dictionary_usage-item-drawer__title {
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.4;
 }
 </style>

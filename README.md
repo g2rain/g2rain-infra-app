@@ -10,9 +10,7 @@
 [![Vite](https://img.shields.io/badge/Vite-7.3.0-646CFF?logo=vite&logoColor=white)](https://vite.dev/)
 [![Qiankun](https://img.shields.io/badge/micro--frontend-Qiankun-1677FF)](https://qiankun.umijs.org/)
 
-> 下一代AI软件开发范式，AI原生Agent平台，开源的企业级SaaS底座。
-
-平台基础设施管理微前端子应用，提供发号器、字典、地区语言与国际化消息管理界面，并以动态资源路由和 qiankun 生命周期接入 g2rain-main-shell。
+G2rain（谷雨）是面向企业的开源智能体平台，连接模型、知识与业务工具，以 SaaS 基座和应用开发工具链支撑智能应用落地。智能体平台已开源，具体组件、版本与接入方式以各责任仓库的说明为准。`g2rain-infra-app` 是其中的基础设施管理微前端子应用，提供发号器、字典、地区语言与国际化消息管理界面，并以动态资源路由和 qiankun 生命周期接入 `g2rain-main-shell`；它不代表或替代整个平台能力，也不拥有 `g2rain-infra` 的领域数据和服务端规则。
 
 [项目文档](docs/index.md) · [官网](https://www.g2rain.com) · [Issues](https://github.com/g2rain/g2rain/issues) · [Discussions](https://github.com/g2rain/g2rain/discussions)
 
@@ -30,6 +28,7 @@
 - 页面代码生成
 - 资源配置生成
 - 构建与镜像
+- GHCR 镜像
 - 代码质量与测试
 - 运行示例
 - 主要页面与后端接口
@@ -100,7 +99,7 @@
 | 页面生成 | `npm run build:generate -- --tables=<table>` | 根据仓库内 DDL 生成页面骨架；执行前先检查 Git 状态。 |
 | 资源生成 | `npm run build:config` | 从静态路由和权限指令生成页面/页面元素 JSON。 |
 
-版本号以项目构建配置为准，当前识别为 `0.1.0`。
+版本号以 `package.json` 和锁文件根包为准，当前为 `1.0.0`。
 
 ## 配置说明
 
@@ -163,8 +162,17 @@ API parser 当前没有接入主流程，`apiEndpoints` 为空，也不会生成
 | 本地开发 | `npm run dev` | 本地开发服务 | 启动前端本地开发服务。 |
 | 前端产物 | `npm run build` | `dist` | 执行类型检查与 Vite/TypeScript 构建，生成可发布产物。 |
 | 产物预览 | `npm run preview` | 本地预览服务 | 在本地预览构建后的前端静态产物。 |
-| 容器镜像 | `docker build --build-arg VITE_BUILD_MODE=production -t g2rain/g2rain-infra-app:<tag> .` | OpenResty 前端镜像 | 构建静态产物、反向代理和 Lua 签名运行环境。 |
-| 构建脚本 | `./build.sh --tag <tag> --build-mode production` | `g2rain/g2rain-infra-app:<tag>` | 封装 Docker BuildKit 镜像构建。 |
+| 容器镜像 | `docker build --build-arg VITE_BUILD_MODE=production --build-arg IMAGE_VERSION=<tag> --build-arg VCS_REF=<commit-sha> -t ghcr.io/g2rain/g2rain-infra-app:<tag> .` | OpenResty 前端镜像 | 使用完整的 `npm run build` 生成静态产物，并加入反向代理和 Lua 签名运行环境。 |
+| 构建脚本 | `./build.sh --tag 1.0.0 --build-mode production` | `ghcr.io/g2rain/g2rain-infra-app:1.0.0` | 使用与 CI 相同的 Dockerfile、构建参数和 OCI 元数据。 |
+
+## GHCR 镜像
+
+- 镜像地址：`ghcr.io/g2rain/g2rain-infra-app`。
+- 稳定版发布 `1.0.0` 这类版本标签，并同时发布 `sha-<完整提交 SHA>` 可追溯标签；不会发布或更新 `latest`。
+- 包公开后可匿名拉取：`docker pull ghcr.io/g2rain/g2rain-infra-app:1.0.0`。
+- 只有推送精确格式的 `v<major>.<minor>.<patch>` Git tag 才会触发发布；标签提交必须位于 `main` 历史中，并包含同名发布说明。
+
+完整的本地构建、CI 构建与测试、GHCR 权限、首次公开、发布顺序、运行时密钥和部署验证说明见[构建与部署](docs/operations/deployment.md#github-container-registryghcr-发布)。
 
 ## 代码质量与测试
 

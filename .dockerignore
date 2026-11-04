@@ -28,6 +28,9 @@ coverage
 .env.local
 .env.*.local
 
+# Runtime signing keys are injected by a Secret or volume, never copied into an image.
+lua/keys/
+
 # 日志文件
 logs
 *.log

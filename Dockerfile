@@ -42,7 +42,6 @@ LABEL org.opencontainers.image.title="g2rain-infra-app" \
       org.opencontainers.image.licenses="Apache-2.0"
 
 RUN set -eux; \
-    sed -i 's|dl-cdn.alpinelinux.org|mirrors.aliyun.com|g' /etc/apk/repositories; \
     apk update; \
     apk add --no-cache \
         curl git perl gettext ca-certificates openssl openssl-dev \
